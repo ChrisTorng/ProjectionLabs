@@ -1,6 +1,6 @@
 # ProjectionLabs
 
-一般 Web 投影效果實驗室。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影與誇張的立體變形。
+七個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
 
 **網站入口：[christorng.idv.tw/ProjectionLabs/](https://christorng.idv.tw/ProjectionLabs/)**
 
@@ -10,11 +10,27 @@
 
 | 實驗室 | 線上入口 | 原始碼入口 | 簡介 |
 | --- | --- | --- | --- |
+| 動態效果組合室 | [開啟](https://christorng.idv.tw/ProjectionLabs/composer/) | [composer/](composer/) | 移植原有 Motion Composer：七個獨立圖層、65 種非空效果、10 組預設、四種頁面排列／接力模式；三頁可編輯內容與完整播放器 HTML 匯出。 |
+| Web Motion Atlas | [開啟](https://christorng.idv.tw/ProjectionLabs/motion-atlas/) | [motion-atlas/](motion-atlas/) | 移植原有 48 種 CSS 單效果圖鑑，含強度／技術分類、收藏、時間軸、互動及捲動效果、能力偵測與獨立 HTML 下載。 |
+| 音樂動態實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/music-motion/) | [music-motion/](music-motion/) | 移植原有七類、64 種非空效果及 12 組預設。以音量、頻段、節奏控制 Canvas 背景、文字、光影與換頁；支援示範音樂、本機檔案、麥克風與無聲模擬。 |
+| 光的筆跡／詩歌手繪 | [開啟](https://christorng.idv.tw/ProjectionLabs/ink-song/) | [ink-song/](ink-song/) | 移植原有 80 秒、六段落的 SVG 詩歌播放器：逐筆落筆、色塊累積、場景延續、循環擦除，支援歌詞編輯、節拍音與繪畫／快轉倍率。 |
 | 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
-共 **96 種效果**。三個實驗室各自是一個子目錄頁面，可從首頁切換。
+共 **7 個獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
+
+## 既有成品的移植範圍
+
+| 原有成品 | 原始碼版本 | 本 repo 路徑 |
+| --- | --- | --- |
+| 歌詞動畫實驗室的一般 Web 部分 | `fba73edc1da1528d23f71594556c0b2ddda009a3` | 原本 `dist/web/` 的組合播放器與圖鑑，分別放入 `composer/`、`motion-atlas/`；不複製 `dist/` 的 FreeShow 頁面。 |
+| 音樂動態實驗室 | `7048dad26f66c2b9945a5643dcea6584e92314bd` | `music-motion/`，包含 Canvas 引擎、Web Audio 引擎與說明文件。 |
+| 光的筆跡｜詩歌手繪實驗室 | `be29de765731b26ae9026abea981b28d57052624` | `ink-song/`，保留原有 SVG 繪畫腳本及播放控制。 |
+
+移植保留原有互動與視覺，只調整站內入口為相對路徑，加入回首頁的連結；沒有帶入 Sites 的部署設定、認證資訊或 Git metadata，也沒有修改原有 Sites 的發布內容。
+
+音樂檔在本機解碼；麥克風需使用者在 HTTPS 頁面主動授權，沒有自動收音。節奏起音是估測，不等於精確的 BPM／小節辨識。音樂頁與手繪頁保留各自的使用方式；以下共用控制說明主要適用於三個分項工作台。
 
 ## 使用方式
 
@@ -76,6 +92,10 @@ python -m http.server 8000
 ```text
 ProjectionLabs/
 ├── index.html           # 實驗室總入口
+├── composer/index.html  # 原有七層組合播放器
+├── motion-atlas/index.html # 原有單效果圖鑑
+├── music-motion/index.html # 音樂反應圖層
+├── ink-song/index.html   # 詩歌手繪播放器
 ├── lyrics/index.html    # 歌詞文字
 ├── transitions/index.html
 ├── backgrounds/index.html

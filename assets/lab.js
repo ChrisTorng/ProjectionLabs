@@ -1,4 +1,4 @@
-import { labs } from './catalog.js';
+import { labs } from './catalog.js?v=20261011-3';
 import { sceneCSS, sceneHTML } from './scene.js';
 
 const lab = labs.find(l => l.id === document.body.dataset.lab);
