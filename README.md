@@ -125,7 +125,7 @@ ProjectionLabs/
 - **WebVTT**：支援帶行內 `<00:00:01.500>` karaoke 時間標記的句型；也支援只有整句起迄的 OBS/Whisper 一般 VTT。後者逐字時間並非真實辨識結果，使用均分估算並標示「逐字時間為估算」。每個字獨立一個 Cue 時也能讀取，但會以各 Cue 作為一行，使用本實驗室的行內標記格式更容易重建整句。
 - **長音及休止**：匯出 WebVTT 時以合法的行內時間標記，搭配零寬空白音節，將休止區間和發聲時間分開；其他軟體可能忽略休止的特殊區分，但字幕文字與時間標記仍有效。WebVTT 時間精度為毫秒，ASS `\\k` 為百分之一秒。
 - **ASS**：仍支援 `\\k`、`\\K`、`\\kf`、`\\ko`，作為專業卡拉 OK 製作流程的交換格式。
-- **節拍 metadata**：WebVTT 使用合法 `NOTE ProjectionLabs BPM=104 BeatsPerBar=4 BeatOffset=0`；ASS 使用註解。它們不是 WebVTT / ASS 標準的節拍欄位，外部工具可忽略；歌詞與逐字時間不依賴 metadata。
+- **節拍 metadata**：WebVTT 使用合法 `NOTE ProjectionLabs BPM=104 BeatsPerBar=4 BeatOffset=0 Alignment=estimated|precise`（其中 `Alignment` 用來保留逐字時間是否估算）；ASS 使用註解。它們不是 WebVTT / ASS 標準的節拍欄位，外部工具可忽略；歌詞與逐字時間不依賴 metadata。
 - 匯出 HTML 時，內嵌 WebVTT 及完整播放器，不依賴原始字幕檔或網路。
 
 ### 跳球的時值與跨頁運動（v3）
