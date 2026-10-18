@@ -10,7 +10,7 @@
   
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="../assets/theme.css">
-  <link rel="stylesheet" href="../assets/lyrics-sync.css?v=2"></head>
+  <link rel="stylesheet" href="../assets/lyrics-sync.css?v=3"></head>
 <body>
 <header class="site-header"><div class="container header-inner">
   <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">P</span>ProjectionLabs</a>
@@ -49,8 +49,10 @@
         <label class="ctrl"><span>陰影擴散 <output id="shadow-val"></output></span><input id="shadow" type="range" min="0" max="50" step="1"></label>
         <label class="ctrl"><span>描邊粗細 <output id="stroke-val"></output></span><input id="stroke" type="range" min="0.4" max="3.5" step="0.1"></label>
         <label class="ctrl"><span>底線厚度 <output id="underline-val"></output></span><input id="underline" type="range" min="1" max="9" step="1"></label>
-        <label class="ctrl"><span>圓球尺寸 <output id="ballSize-val"></output></span><input id="ballSize" type="range" min="8" max="36" step="1"></label>
-        <label class="ctrl"><span>圓球跳動高度 <output id="bounce-val"></output></span><input id="bounce" type="range" min="8" max="72" step="1"></label>
+        <label class="ctrl"><span>圓球尺寸（相對字寬）<output id="ballSize-val"></output></span><input id="ballSize" type="range" min="12" max="38" step="1"></label>
+        <label class="ctrl"><span>四分音符跳高基準 <output id="bounce-val"></output></span><input id="bounce" type="range" min="8" max="72" step="1"></label>
+        <label class="ctrl"><span>跳高模式</span><select id="jumpStyle"><option value="auto">依音符長度（八分 = 四分的一半）</option><option value="low">整體低跳（× 0.62）</option><option value="high">整體高跳（× 1.42）</option><option value="alternate">高低交錯</option></select></label>
+        <p class="ball-help">球在字頂接觸時壓扁回彈；跨句時沿同一條空中拋物線飛至下一頁第一字。長音每拍再跳，球不因換頁消失。</p>
       </section>
       <section class="control-panel"><div class="panel-heading"><h2>資料與對位</h2><span class="hint-text">全部只在本機處理</span></div>
         <div class="stats-row"><span><strong>104</strong><small>BPM</small></span><span><strong>4/4</strong><small>拍號</small></span><span><strong id="word-count">72</strong><small>歌詞字數</small></span></div>
@@ -63,11 +65,11 @@
   </div>
   <section class="browse-section" aria-label="獨立文字效果"><div class="section-top"><div><span class="eyebrow">EFFECT LAYERS / MULTI-SELECT</span><h2>單項效果測試</h2></div><p>28 種可逐項啟用；每類都有「無效果」。字面遮罩與球型效果單選，其他分類自由疊加。</p></div><div class="fx-grid" id="fx-grid"></div></section>
   <section class="browse-section" aria-label="預設成組效果"><div class="section-top"><div><span class="eyebrow">PRESET COMBINATIONS / ONE CLICK</span><h2>預設組合預覽</h2></div><p>11 組有意義的效果鏈；點選後主預覽立即切換。</p></div><div class="preset-grid" id="preset-grid"></div></section>
-  <div class="footnote">示範音訊是無人聲的合成音符與變化鼓點，文字精確對應其起音與時值。104 BPM，八句各兩小節，從 00:00 起立即有字，最後一字結束即停止；句中休止仍保留文字。圓球飛行路徑使用逐格拋物線位置，而非水平底部滑動。</div>
+  <div class="footnote">示範音訊是無人聲的合成音符與變化鼓點，文字精確對應其起音與時值。104 BPM，八句各兩小節，從 00:00 起立即有字，最後一字結束即停止；句中休止仍保留文字。圓球按音符時值決定跳高，落下壓扁再回彈；跨頁保持連續飛行，不會瞬間跳位或消失。</div>
 </main>
 <footer class="site-footer"><div class="container footer-inner"><span>ProjectionLabs · 歌詞節拍同步原型</span><a href="https://github.com/ChrisTorng/ProjectionLabs">GitHub 原始碼</a></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script type="module" src="../assets/lyrics-sync.js?v=2"></script>
+<script type="module" src="../assets/lyrics-sync.js?v=3"></script>
 </body>
 </html>
