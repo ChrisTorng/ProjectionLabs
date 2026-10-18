@@ -540,6 +540,7 @@ function parseVtt(source){
   const meta=text.match(/^NOTE\s+ProjectionLabs[^\n]*$/im)?.[0]||'';
   const option=(key,def)=>{const match=meta.match(new RegExp('\\b'+key+'=([-+\\d.]+)','i'));return match?Number(match[1]):def;};
   const blocks=text.split(/\n\s*\n/),lines=[];
+  const declaredEstimate=/\bAlignment=estimated\b/i.test(meta);
   let estimate=false,segmented=0;
   for(const block of blocks){
     const rows=block.trim().split('\n');
@@ -578,10 +579,10 @@ function parseVtt(source){
     lines.push({text:display,start,end,words,rhythm:''});
   }
   if(!lines.length)throw Error('找不到有效的 WebVTT 字幕區段');
-  return {title:'WebVTT 逐字歌詞',bpm:option('BPM',state.bpm||104),beatsPerBar:option('BeatsPerBar',state.beatsPerBar||4),beatOffset:option('BeatOffset',0),duration:Math.max(...lines.map(l=>l.end)),lines,alignment:estimate?'estimated':'precise',segmented};
+  return {title:'WebVTT 逐字歌詞',bpm:option('BPM',state.bpm||104),beatsPerBar:option('BeatsPerBar',state.beatsPerBar||4),beatOffset:option('BeatOffset',0),duration:Math.max(...lines.map(l=>l.end)),lines,alignment:estimate||declaredEstimate?'estimated':'precise',segmented};
 }
 function exportVtt(data=state.data){
-  const out=['WEBVTT','',`NOTE ProjectionLabs BPM=${data.bpm??state.bpm} BeatsPerBar=${data.beatsPerBar??state.beatsPerBar} BeatOffset=${data.beatOffset??state.beatOffset}`,''];
+  const out=['WEBVTT','',`NOTE ProjectionLabs BPM=${data.bpm??state.bpm} BeatsPerBar=${data.beatsPerBar??state.beatsPerBar} BeatOffset=${data.beatOffset??state.beatOffset} Alignment=${data.alignment==='estimated'?'estimated':'precise'}`,''];
   const encoded=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   data.lines.forEach((line,i)=>{
     let payload='',index=0,cursor=line.start;
@@ -809,7 +810,7 @@ async function main(){
   let demo;
   try{demo=embeddedVtt?parseVtt(embeddedVtt.textContent):embeddedAss?parseAss(embeddedAss.textContent):parseVtt(await fetch('./demo.vtt').then(r=>{if(!r.ok)throw Error('WebVTT 範例載入失敗');return r.text();}));}
   catch(e){const note=document.createElement('p');note.className='error-box';note.textContent=e.message;$('#projection-lyrics').replaceChildren(note);return;}
-  renderSelectors();setupTransport();state.originalDemo=structuredClone(demo);useData(demo,'manual-demo');usePreset('obvious');
+  renderSelectors();setupTransport();state.originalDemo=(embeddedVtt||embeddedAss)?null:structuredClone(demo);useData(demo,(embeddedVtt||embeddedAss)?(demo.alignment||'precise'):'manual-demo');usePreset('obvious');
   const saved=$('#embedded-configuration');if(saved){try{const options=JSON.parse(saved.textContent);if(options.preset&&PRESETS[options.preset])usePreset(options.preset);else if(options.settings){state.settings={...state.settings,...options.settings};state.fx=new Set((options.fx||[]).filter(id=>ALL_FX.some(f=>f.id===id)));state.preset=null;setStyle();}seekTo(options.position||0);}catch(e){console.warn('載入匯出樣式失敗',e);}}
   initialized=true;
 }
