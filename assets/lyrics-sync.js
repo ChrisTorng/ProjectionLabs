@@ -154,7 +154,7 @@ function useData(data,alignment='precise'){
   state.position=0;state.displayedLine=-2;state.activeWord=-2;
   $('#bpm').value=state.bpm;$('#bpm-val').textContent=state.bpm+' BPM';
   $('#seek').max=state.duration;$('#seek').value=0;
-  const badge=$('#alignment-status');badge.textContent=alignment==='manual-demo'?'ASS 示範逐字對位':'ASS 卡拉 OK 精準時間';badge.classList.remove('estimated');
+  const badge=$('#alignment-status');badge.textContent=alignment==='estimated'?'逐字時間為估算':alignment==='manual-demo'?'內建示範精確對位':'精確逐字時間';badge.classList.toggle('estimated',alignment==='estimated');
   $('#word-count').textContent=state.data.lines.reduce((n,l)=>n+l.words.length,0);
   $('#stage-counter').textContent=`${state.bpm} BPM · ${state.beatsPerBar}/4`;
   $('#data-note').innerHTML='單一 <b>ASS</b> 檔案包含整句起迄、每個音節的 <code>\\kf</code> 時值，以及空音節休止。匯入後依精確音節時間驅動效果；無須 SRT 或外部 JSON。BPM 註解是本實驗室額外使用的選填資訊。';
@@ -504,6 +504,116 @@ function seekTo(value){
   renderAt(t);
 }
 function toggleClick(){state.clicks=!state.clicks;$('#click-toggle').setAttribute('aria-pressed',String(state.clicks));$('#click-toggle').textContent='伴奏：'+(state.clicks?'開':'關');if(!state.clicks)stopSources();}
+// WebVTT 逐字時間：符合標準的 cue 內嵌 timestamp、休止以零寬字元維持時間分隔。
+// NOTE 是合法的 WebVTT 註解；BPM / 拍號是非必要的 ProjectionLabs 延伸中繼資料。
+const VTT_REST='\u200b';
+function vttTime(t){
+  const ms=Math.max(0,Math.round(t*1000));
+  const h=Math.floor(ms/3600000),m=Math.floor(ms/60000)%60,sec=Math.floor(ms/1000)%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(ms%1000).padStart(3,'0')}`;
+}
+function vttSeconds(value){
+  const parts=value.trim().split(':');
+  if(parts.length!==2&&parts.length!==3)throw Error('WebVTT 時間格式錯誤：'+value);
+  const last=parts.pop(),m=last.match(/^(\d{2})\.(\d{3})$/);
+  if(!m||Number(m[1])>59)throw Error('WebVTT 時間格式錯誤：'+value);
+  const minute=Number(parts.pop());
+  if(!Number.isInteger(minute)||minute>59&&parts.length>0)throw Error('WebVTT 分鐘無效：'+value);
+  const hour=parts.length?Number(parts.pop()):0;
+  return hour*3600+minute*60+Number(m[1])+Number(m[2])/1000;
+}
+function vttDecode(text){
+  const map={amp:'&',lt:'<',gt:'>',nbsp:' ',lrm:'',rlm:''};
+  return text.replace(/&(amp|lt|gt|nbsp|lrm|rlm|#\d+|#x[\da-f]+);/gi,(entity,key)=>{
+    if(key[0]!=='#')return map[key.toLowerCase()]??entity;
+    const n=key[1].toLowerCase()==='x'?parseInt(key.slice(2),16):Number(key.slice(1));
+    return n>0&&n<=0x10ffff?String.fromCodePoint(n):entity;
+  });
+}
+function vttPlain(payload){
+  return vttDecode(payload.replace(/<\/?(?:c(?:\.[\w-]+)*|v(?:\s+[^>]*)?|lang(?:\s+[^>]*)?|b|i|u|ruby|rt)>/gi,'')
+    .replace(/<[^>]*>/g,'').replace(/\u200b/g,''));
+}
+function parseVtt(source){
+  const text=String(source).replace(/^\uFEFF/,'').replace(/\r/g,'');
+  if(!/^WEBVTT(?:[ \t].*)?\s*(?:\n|$)/.test(text))throw Error('檔案缺少 WEBVTT 標頭');
+  const meta=text.match(/^NOTE\s+ProjectionLabs[^\n]*$/im)?.[0]||'';
+  const option=(key,def)=>{const match=meta.match(new RegExp('\\b'+key+'=([-+\\d.]+)','i'));return match?Number(match[1]):def;};
+  const blocks=text.split(/\n\s*\n/),lines=[];
+  let estimate=false,segmented=0;
+  for(const block of blocks){
+    const rows=block.trim().split('\n');
+    if(!rows.length||/^(?:WEBVTT|NOTE(?:\s|$)|STYLE(?:\s|$)|REGION(?:\s|$))/i.test(rows[0]))continue;
+    const at=rows.findIndex(x=>x.includes('-->'));
+    if(at<0)continue;
+    const time=rows[at].match(/^\s*((?:\d\d:)?\d\d:\d\d\.\d{3})\s+-->\s+((?:\d\d:)?\d\d:\d\d\.\d{3})(?:\s+.*)?$/);
+    if(!time)continue;
+    const start=vttSeconds(time[1]),end=vttSeconds(time[2]);
+    if(end<=start)continue;
+    const payload=rows.slice(at+1).join(' ');
+    const stamps=/<((?:\d\d:)?\d\d:\d\d\.\d{3})>/g;
+    const slices=[];let prev=0,atTime=start,found=false,match;
+    while((match=stamps.exec(payload))){
+      const t=vttSeconds(match[1]);
+      if(t<=atTime+0.00001||t>=end-0.00001)throw Error('WebVTT 行內時間標記必須嚴格遞增，且位於字幕起迄之間');
+      slices.push({raw:payload.slice(prev,match.index),start:atTime,end:t});
+      atTime=t;prev=stamps.lastIndex;found=true;
+    }
+    slices.push({raw:payload.slice(prev),start:atTime,end});
+    const cleanText=vttPlain(payload.replace(stamps,''));
+    const display=cleanText.replace(/\s+/g,' ').trim();
+    if(!display)continue;
+    let words=[];
+    for(const slice of slices){
+      const syllable=vttPlain(slice.raw).trim();
+      if(syllable)words.push({text:syllable,start:slice.start,end:slice.end});
+    }
+    if(!found){
+      // A single isolated Han character or one Latin word is already a word-accurate cue.
+      const isolated=/^[\p{Script=Han}]$/u.test(display)||/^[A-Za-z]+(?:[-’'][A-Za-z]+)*$/u.test(display);
+      words=isolated?[{text:display,start,end}]:estimateWords(display,start,end);
+      if(!isolated)estimate=true;
+    }
+    else segmented++;
+    lines.push({text:display,start,end,words,rhythm:''});
+  }
+  if(!lines.length)throw Error('找不到有效的 WebVTT 字幕區段');
+  return {title:'WebVTT 逐字歌詞',bpm:option('BPM',state.bpm||104),beatsPerBar:option('BeatsPerBar',state.beatsPerBar||4),beatOffset:option('BeatOffset',0),duration:Math.max(...lines.map(l=>l.end)),lines,alignment:estimate?'estimated':'precise',segmented};
+}
+function exportVtt(data=state.data){
+  const out=['WEBVTT','',`NOTE ProjectionLabs BPM=${data.bpm??state.bpm} BeatsPerBar=${data.beatsPerBar??state.beatsPerBar} BeatOffset=${data.beatOffset??state.beatOffset}`,''];
+  const encoded=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  data.lines.forEach((line,i)=>{
+    let payload='',index=0,cursor=line.start;
+    for(const word of line.words){
+      const found=line.text.indexOf(word.text,index);
+      if(found<0)throw Error('WebVTT 匯出失敗：歌詞與時間碼不一致');
+      const separator=line.text.slice(index,found);
+      const at=Math.max(line.start,word.start),stop=Math.min(line.end,word.end);
+      if(at>cursor+0.0005){
+        // Use a zero-width rest syllable. Two *valid* timestamps preserve the note's explicit end.
+        if(cursor>line.start+0.0005&&cursor<line.end-0.0005)payload+=`<${vttTime(cursor)}>`;
+        payload+=VTT_REST;
+      }
+      if(at>line.start+0.0005){
+        if(at<=cursor+0.0005||at<line.end-0.0005)payload+=`<${vttTime(at)}>`;
+      }
+      payload+=encoded(separator+word.text);
+      cursor=stop;index=found+word.text.length;
+    }
+    payload+=encoded(line.text.slice(index));
+    out.push(`line-${String(i+1).padStart(2,'0')}`,`${vttTime(line.start)} --> ${vttTime(line.end)}`,payload,'');
+  });
+  return out.join('\n');
+}
+function downloadVtt(){downloadText('\uFEFF'+exportVtt({...state.data,bpm:state.bpm,beatsPerBar:state.beatsPerBar,beatOffset:state.beatOffset}),'lyrics-karaoke.vtt','text/vtt;charset=utf-8');}
+async function importVttFile(input){
+  const file=input.files?.[0];if(!file)return;
+  try{
+    const data=parseVtt(await file.text());state.originalDemo=null;useData(data,data.alignment);
+    toast(data.alignment==='estimated'?'已匯入 WebVTT：只有整句時間，逐字對位為估算':'已匯入 WebVTT 精確逐字時間');
+  }catch(e){toast('匯入 WebVTT 失敗：'+e.message);}finally{input.value='';}
+}
 // Advanced SubStation Alpha (ASS) karaoke import. Durations are in centiseconds.
 // The optional BPM/BeatsPerBar/BeatOffset comment metadata is local to this app;
  // karaoke tags and Dialogue timing remain standard ASS.
@@ -633,7 +743,7 @@ async function exportStandalone(){
     html.documentElement.lang='zh-Hant';
     html.head.innerHTML='<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>逐字節拍同步播放 · 離線版</title>';
     const style=html.createElement('style');style.id='sync-embedded-style';style.textContent=fetched[0]+'\n'+fetched[1];html.head.append(style);
-    // Export the current timing as a single interoperable ASS file embedded in the HTML.
+    // Export the current timing as a self-contained WebVTT subtitle script embedded in the HTML.
     const source=document.querySelector('main').cloneNode(true);
     html.body.append(document.querySelector('.site-header').cloneNode(true),source,document.querySelector('.site-footer').cloneNode(true));
     const dataScript=html.createElement('script');dataScript.type='text/plain';dataScript.id='embedded-ass';dataScript.textContent=exportAss({...state.data,bpm:state.bpm,beatOffset:state.beatOffset,duration:state.duration}).replace(/<\//g,'<\\/');html.body.append(dataScript);
@@ -654,6 +764,7 @@ function setupTransport(){
   $('#fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('#projection').requestFullscreen();}catch{$('#projection').classList.toggle('is-expanded');}});
   $('#exit-fullscreen').addEventListener('click',()=>{if(document.fullscreenElement)document.exitFullscreen();else $('#projection').classList.remove('is-expanded');});
   $('#ass-file').addEventListener('change',e=>importAssFile(e.target));
+  $('#vtt-file').addEventListener('change',e=>importVttFile(e.target));
   $('#audio-file').addEventListener('change',e=>{
     const file=e.target.files?.[0];if(!file)return;
     pause();if(state.mediaUrl)URL.revokeObjectURL(state.mediaUrl);
@@ -680,6 +791,7 @@ function setupTransport(){
     if(state.playing&&!state.media){state.position=position();reseedClock();}
   });
   $('#download-ass').addEventListener('click',downloadAss);
+  $('#download-vtt').addEventListener('click',downloadVtt);
   $('#download-audio').addEventListener('click',generateWav);
   $('#download-html')?.addEventListener('click',exportStandalone);
   document.addEventListener('keydown',e=>{
@@ -693,9 +805,9 @@ function setupTransport(){
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)pause();});
 }
 async function main(){
-  const embedded=$('#embedded-ass');
+  const embeddedVtt=$('#embedded-vtt'),embeddedAss=$('#embedded-ass');
   let demo;
-  try{demo=parseAss(embedded?embedded.textContent:await fetch('./demo.ass').then(r=>{if(!r.ok)throw Error('ASS 範例載入失敗');return r.text();}));}
+  try{demo=embeddedVtt?parseVtt(embeddedVtt.textContent):embeddedAss?parseAss(embeddedAss.textContent):parseVtt(await fetch('./demo.vtt').then(r=>{if(!r.ok)throw Error('WebVTT 範例載入失敗');return r.text();}));}
   catch(e){const note=document.createElement('p');note.className='error-box';note.textContent=e.message;$('#projection-lyrics').replaceChildren(note);return;}
   renderSelectors();setupTransport();state.originalDemo=structuredClone(demo);useData(demo,'manual-demo');usePreset('obvious');
   const saved=$('#embedded-configuration');if(saved){try{const options=JSON.parse(saved.textContent);if(options.preset&&PRESETS[options.preset])usePreset(options.preset);else if(options.settings){state.settings={...state.settings,...options.settings};state.fx=new Set((options.fx||[]).filter(id=>ALL_FX.some(f=>f.id===id)));state.preset=null;setStyle();}seekTo(options.position||0);}catch(e){console.warn('載入匯出樣式失敗',e);}}
