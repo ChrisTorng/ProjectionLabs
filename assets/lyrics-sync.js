@@ -55,17 +55,17 @@ const FX_CATALOG = [
 const ALL_FX = FX_CATALOG.map(([id,title,desc,group])=>({id,title,desc,group}));
 const EXCLUSIVE = new Set(['reveal','ball']);
 const PRESETS = {
- gentle:{name:'輕柔',desc:'淡入、微光與柔和的逐字底線',accentColor:'#c2f1dd',baseColor:'#dce5ee',bgColor:'#08182a',fontSize:7.2,scale:9,shadow:8,stroke:1.3,underline:2,ballSize:12,bounce:20,moveX:0,moveY:0,fx:['fade','color','shadow','underline']},
- obvious:{name:'明顯',desc:'逐字強調、底線與連續拋物線跳球',accentColor:'#ffe1a1',baseColor:'#dce7f0',bgColor:'#091b2e',fontSize:7.6,scale:27,shadow:13,stroke:1.4,underline:4,ballSize:16,bounce:39,moveX:0,moveY:0,fx:['scale','color','shadow','underline','ball']},
- exaggerated:{name:'誇張',desc:'彈性變形、強光、落球爆裂與粒子',accentColor:'#ffa3cf',baseColor:'#eef3ff',bgColor:'#1c102c',fontSize:8,scale:56,shadow:30,stroke:1.9,underline:5,ballSize:22,bounce:60,moveX:0,moveY:0,fx:['scale','squash','color','glow','spark','ball-impact']},
- modern:{name:'現代',desc:'水平填色、乾淨底線與側向滑入',accentColor:'#79f2dc',baseColor:'#d1e1ed',bgColor:'#071d29',fontSize:7.7,scale:15,shadow:5,stroke:1.6,underline:3,ballSize:13,bounce:25,moveX:0,moveY:0,fx:['fill','slide-left','color','underline']},
- scifi:{name:'科幻',desc:'圓形揭露、雙色分光與脈衝光環',accentColor:'#74eaff',baseColor:'#c7d4e7',bgColor:'#080c24',fontSize:7.8,scale:22,shadow:26,stroke:1.7,underline:2,ballSize:15,bounce:37,moveX:0,moveY:0,fx:['fill-circle','trail','glow','pulse','halo']},
- cinematic:{name:'電影感',desc:'垂直填滿，層次光影與緩緩上浮',accentColor:'#ffe1a3',baseColor:'#d4dce8',bgColor:'#181522',fontSize:7.9,scale:15,shadow:21,stroke:1.4,underline:2,ballSize:14,bounce:26,moveX:0,moveY:0,fx:['fill-down','fade','shadow','glow','lift']},
- retro:{name:'復古歌球',desc:'傳統跳球在整句上方按字跳躍',accentColor:'#ffc974',baseColor:'#eee1cc',bgColor:'#221b18',fontSize:7.7,scale:15,shadow:9,stroke:1.7,underline:2,ballSize:21,bounce:45,moveX:0,moveY:0,fx:['ball','color','scale']},
+ gentle:{name:'輕柔',desc:'淡入、微光與柔和的逐字底線',accentColor:'#c2f1dd',baseColor:'#dce5ee',bgColor:'#08182a',fontSize:7.2,scale:9,shadow:8,stroke:1.3,underline:2,ballSize:19,bounce:20,moveX:0,moveY:0,fx:['fade','color','shadow','underline']},
+ obvious:{name:'明顯',desc:'逐字強調、底線與連續拋物線跳球',accentColor:'#ffe1a1',baseColor:'#dce7f0',bgColor:'#091b2e',fontSize:7.6,scale:27,shadow:13,stroke:1.4,underline:4,ballSize:20,bounce:39,moveX:0,moveY:0,fx:['scale','color','shadow','underline','ball']},
+ exaggerated:{name:'誇張',desc:'彈性變形、強光、落球爆裂與粒子',accentColor:'#ffa3cf',baseColor:'#eef3ff',bgColor:'#1c102c',fontSize:8,scale:56,shadow:30,stroke:1.9,underline:5,ballSize:24,bounce:60,moveX:0,moveY:0,fx:['scale','squash','color','glow','spark','ball-impact']},
+ modern:{name:'現代',desc:'水平填色、乾淨底線與側向滑入',accentColor:'#79f2dc',baseColor:'#d1e1ed',bgColor:'#071d29',fontSize:7.7,scale:15,shadow:5,stroke:1.6,underline:3,ballSize:19,bounce:25,moveX:0,moveY:0,fx:['fill','slide-left','color','underline']},
+ scifi:{name:'科幻',desc:'圓形揭露、雙色分光與脈衝光環',accentColor:'#74eaff',baseColor:'#c7d4e7',bgColor:'#080c24',fontSize:7.8,scale:22,shadow:26,stroke:1.7,underline:2,ballSize:21,bounce:37,moveX:0,moveY:0,fx:['fill-circle','trail','glow','pulse','halo']},
+ cinematic:{name:'電影感',desc:'垂直填滿，層次光影與緩緩上浮',accentColor:'#ffe1a3',baseColor:'#d4dce8',bgColor:'#181522',fontSize:7.9,scale:15,shadow:21,stroke:1.4,underline:2,ballSize:19,bounce:26,moveX:0,moveY:0,fx:['fill-down','fade','shadow','glow','lift']},
+ retro:{name:'復古歌球',desc:'傳統跳球在整句上方按字跳躍',accentColor:'#ffc974',baseColor:'#eee1cc',bgColor:'#221b18',fontSize:7.7,scale:15,shadow:9,stroke:1.7,underline:2,ballSize:23,bounce:45,moveX:0,moveY:0,fx:['ball','color','scale']},
  impact:{name:'能量灌注',desc:'落球碰撞空心字，墨色從上往下流入',accentColor:'#7ce8ff',baseColor:'#c2d8e5',bgColor:'#071d2c',fontSize:8,scale:9,shadow:20,stroke:2,underline:3,ballSize:22,bounce:49,moveX:0,moveY:0,fx:['ball-ink','fill-down','glow','spark']},
- fragments:{name:'碎片重組',desc:'零件從四周高速匯聚，組成發光文字',accentColor:'#b9a1ff',baseColor:'#d7d1e9',bgColor:'#12112a',fontSize:7.9,scale:12,shadow:22,stroke:1.3,underline:3,ballSize:16,bounce:42,moveX:0,moveY:0,fx:['assemble','shadow','glow','underline']},
- gravity:{name:'色彩墜入',desc:'彩色實心字從上方掉下，落入空心文字',accentColor:'#f9b77c',baseColor:'#dbe0e8',bgColor:'#172333',fontSize:8,scale:16,shadow:12,stroke:2,underline:2,ballSize:15,bounce:38,moveX:0,moveY:0,fx:['glyph-fall','spark','shadow']},
- pure:{name:'全無效果',desc:'整句維持靜態；用於確認疊加前後差異',accentColor:'#fff2d8',baseColor:'#e5edf8',bgColor:'#091625',fontSize:7.6,scale:0,shadow:0,stroke:1.3,underline:2,ballSize:15,bounce:35,moveX:0,moveY:0,fx:[]}
+ fragments:{name:'碎片重組',desc:'零件從四周高速匯聚，組成發光文字',accentColor:'#b9a1ff',baseColor:'#d7d1e9',bgColor:'#12112a',fontSize:7.9,scale:12,shadow:22,stroke:1.3,underline:3,ballSize:19,bounce:42,moveX:0,moveY:0,fx:['assemble','shadow','glow','underline']},
+ gravity:{name:'色彩墜入',desc:'彩色實心字從上方掉下，落入空心文字',accentColor:'#f9b77c',baseColor:'#dbe0e8',bgColor:'#172333',fontSize:8,scale:16,shadow:12,stroke:2,underline:2,ballSize:20,bounce:38,moveX:0,moveY:0,fx:['glyph-fall','spark','shadow']},
+ pure:{name:'全無效果',desc:'整句維持靜態；用於確認疊加前後差異',accentColor:'#fff2d8',baseColor:'#e5edf8',bgColor:'#091625',fontSize:7.6,scale:0,shadow:0,stroke:1.3,underline:2,ballSize:19,bounce:35,moveX:0,moveY:0,fx:[]}
 };
 const state = {data:null, originalDemo:null, bpm:96, beatsPerBar:4, beatOffset:0, duration:45, wordAlignment:'manual-demo',
   preset:'obvious', settings:{}, fx:new Set(), playing:false, position:0, loop:true, clicks:true,
@@ -73,6 +73,7 @@ const state = {data:null, originalDemo:null, bpm:96, beatsPerBar:4, beatOffset:0
   displayedLine:-2, activeWord:-2, displayedBeat:-2, isSeeking:false, ballEvents:[], melodyEvents:[], nextNote:0};
 const ids = ['fontSize','scale','shadow','stroke','underline','ballSize','bounce','moveX','moveY','baseColor','accentColor','bgColor'];
 let glyphs = [], chipButtons = [], toastTimer;
+const landingCache = new Map(); // Stable glyph geometry; never follow animated glyph transforms.
 let initialized = false;
 function toast(message){const node=$('#toast');node.textContent=message;node.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove('show'),3200);}
 function setStyle(){
@@ -84,21 +85,23 @@ function setStyle(){
   stage.style.setProperty('--lyric-font',o.fontSize+'cqw');
   stage.style.setProperty('--stroke-size',o.stroke+'px');
   stage.style.setProperty('--underline-size',o.underline+'px');
-  stage.style.setProperty('--ball-size',o.ballSize+'px');
+  // Diameter follows the glyph width, not a fixed pixel radius. The physical engine sets the final diameter.
   stage.style.setProperty('--shift-x',state.fx.has('shift')?o.moveX+'px':'0px');
   stage.style.setProperty('--shift-y',state.fx.has('shift')?o.moveY+'px':'0px');
   document.documentElement.style.setProperty('--accent',o.accentColor);
-  for(const id of ids){const e=$('#'+id);if(e)e.value=o[id];const v=$('#'+id+'-val');if(v)v.textContent=id==='fontSize'?o[id]+' cqw':id==='scale'?o[id]+'%':id==='shadow'||id==='ballSize'||id==='bounce'||id==='underline'||id==='moveX'||id==='moveY'?o[id]+' px':id==='stroke'?o[id]+' px':'';}
+  for(const id of ids){const e=$('#'+id);if(e)e.value=o[id];const v=$('#'+id+'-val');if(v)v.textContent=id==='fontSize'?o[id]+' cqw':id==='scale'?o[id]+'%':id==='ballSize'?o[id]+'% 字寬':id==='shadow'||id==='bounce'||id==='underline'||id==='moveX'||id==='moveY'?o[id]+' px':id==='stroke'?o[id]+' px':'';}
   $$('#preset-select [data-preset],#preset-grid [data-preset]').forEach(e=>e.classList.toggle('active',e.dataset.preset===state.preset));
   $$('#fx-grid [data-fx]').forEach(e=>{const selected=state.fx.has(e.dataset.fx);e.classList.toggle('enabled',selected);e.setAttribute('aria-pressed',String(selected));e.querySelector('.fx-indicator').textContent=selected?'● 已啟用':'○ 未啟用';});
   $$('#fx-grid .fx-none').forEach(e=>{const members=ALL_FX.filter(f=>f.group===e.dataset.group);const none=!members.some(f=>state.fx.has(f.id));e.classList.toggle('enabled',none);e.setAttribute('aria-pressed',String(none));});
+  landingCache.clear();
+  $('#jumpStyle').value=o.jumpStyle||'auto';
   if(state.displayedLine>=0)buildStage(state.displayedLine);
   renderAt(position());
 }
 function usePreset(id){
   const p=PRESETS[id];if(!p)return;
   state.preset=id;
-  state.settings=Object.fromEntries(ids.map(k=>[k,p[k]]));
+  state.settings={...Object.fromEntries(ids.map(k=>[k,p[k]])),jumpStyle:p.jumpStyle||'auto'};
   state.fx=new Set(p.fx);
   setStyle();
 }
@@ -117,6 +120,7 @@ function renderSelectors(){
     state.preset=null;setStyle();
   });
   for(const key of ids){$('#'+key)?.addEventListener('input',e=>{state.settings[key]=e.target.type==='color'?e.target.value:Number(e.target.value);state.preset=null;setStyle();});}
+  $('#jumpStyle').addEventListener('change',e=>{state.settings.jumpStyle=e.target.value;state.preset=null;setStyle();});
   $('#reset-style').addEventListener('click',()=>usePreset('obvious'));
 }
 function normalizeData(raw,mode='precise'){
@@ -155,7 +159,7 @@ function useData(data,alignment='precise'){
   $('#stage-counter').textContent=`${state.bpm} BPM · ${state.beatsPerBar}/4`;
   if(estimate)$('#data-note').innerHTML='目前載入的是一般 <b>SRT</b>，只有整句時間；逐字時間是<b>線性估算</b>，並不是辨識到的實際演唱起音。請載入精確 JSON 取代。';
   else $('#data-note').textContent='已載入含逐字 start/end 的時間碼。長音字跨越多拍時，圓球會以拍點在原字上方重複跳動；節拍與歌詞共用時間軸。';
-  rebuildEvents();buildTimeline();renderAt(0);
+  landingCache.clear();rebuildEvents();buildTimeline();renderAt(0);
 }
 function buildTimeline(){
   const target=$('#timeline');target.replaceChildren();chipButtons=[];
@@ -182,7 +186,7 @@ function buildStage(index){
   for(const ch of Array.from(line.text)){
     if(/^\s$/u.test(ch)){const s=document.createElement('span');s.className='glyph space';s.textContent=' ';stage.append(s);continue;}
     const word=line.words[wi++];if(!word)break;
-    const span=document.createElement('span');span.className='glyph';span.dataset.char=ch;
+    const span=document.createElement('span');span.className='glyph';
     const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id));
     span.dataset.drawn=reveal?reveal.id:'none';
     const outline=document.createElement('span');outline.className='glyph-outline';outline.textContent=ch;
@@ -209,13 +213,51 @@ function rebuildEvents(){
       if(time>w.start+.075)events.push({time,li,wi,onset:false});
     }
   }));
+  // The last hop of the song has a real landing on the first character at loop rollover.
+  // This creates an uninterrupted arc rather than teleporting at the playback boundary.
+  if(events.length && state.duration>events.at(-1).time+0.015)
+    events.push({time:state.duration,li:0,wi:0,onset:false,loopBoundary:true});
   state.ballEvents=events.sort((a,b)=>a.time-b.time||Number(b.onset)-Number(a.onset));
   state.melodyEvents=melody.sort((a,b)=>a.start-b.start);
 }
-function landing(index){
-  const glyph=glyphs[index],content=$('#projection-content');if(!glyph)return null;
-  const gr=glyph.getBoundingClientRect(),cr=content.getBoundingClientRect();
-  return {x:gr.left-cr.left+gr.width/2, y:gr.top-cr.top-3};
+// Build an invisible line using the exact same typography and centering as the live line.
+// Positions for ALL lyric pages are available even before the incoming page is shown.
+// This avoids jumping or hiding the ball when the lyric DOM is replaced at a page change.
+function landingFor(li,wi){
+  const line=state.data?.lines[li];if(!line)return null;
+  const content=$('#projection-content');
+  const key=`${li}|${state.settings.fontSize}|${content.clientWidth}|${content.clientHeight}`;
+  let positions=landingCache.get(key);
+  if(!positions){
+    const probe=document.createElement('div');
+    probe.className='projection-lyrics lyric-metric-probe';
+    probe.setAttribute('aria-hidden','true');
+    for(const ch of Array.from(line.text)){
+      const glyph=document.createElement('span');
+      glyph.className=/^\s$/u.test(ch)?'glyph space':'glyph';
+      glyph.textContent=ch;
+      probe.append(glyph);
+    }
+    content.append(probe);
+    const cr=content.getBoundingClientRect();
+    positions=Array.from(probe.children).filter(el=>!el.classList.contains('space')).map(el=>{
+      const r=el.getBoundingClientRect();
+      return {x:r.left-cr.left+r.width/2,y:r.top-cr.top-3,width:r.width,height:r.height};
+    });
+    probe.remove();
+    landingCache.set(key,positions);
+  }
+  return positions[wi]||null;
+}
+function landing(index){return landingFor(state.displayedLine,index);}
+function ballDiameter(point){
+  // 20% of one character: responsive, naturally much smaller than the text.
+  return clamp(point.width*(state.settings.ballSize||20)/100,4,22);
+}
+function setBallDiameter(point){
+  const size=ballDiameter(point);
+  $('#projection').style.setProperty('--ball-size',size.toFixed(2)+'px');
+  return size;
 }
 function showImpact(t,lineIndex,mode){
   const ball=$('#ball'),impact=$('#impact'),beat=60/state.bpm;
@@ -227,7 +269,7 @@ function showImpact(t,lineIndex,mode){
   }
   if(!nearest){ball.hidden=true;impact.hidden=true;return;}
   const p=landing(nearest.wi);if(!p){ball.hidden=true;impact.hidden=true;return;}
-  const size=state.settings.ballSize;
+  const size=setBallDiameter(p);
   const {dt}=nearest;
   if(dt<0){
     ball.hidden=false;impact.hidden=true;
@@ -246,27 +288,53 @@ function showImpact(t,lineIndex,mode){
 function renderBall(t,lineIndex){
   const ball=$('#ball'),impact=$('#impact');
   const mode=['ball','ball-impact','ball-ink'].find(id=>state.fx.has(id));
-  if(!mode||lineIndex<0){ball.hidden=true;impact.hidden=true;return;}
-  if(mode!=='ball'){showImpact(t,lineIndex,mode);return;}
+  if(!mode){ball.hidden=true;impact.hidden=true;return;}
+  if(mode!=='ball'){
+    if(lineIndex<0){ball.hidden=true;impact.hidden=true;return;}
+    showImpact(t,lineIndex,mode);return;
+  }
   impact.hidden=true;
   const events=state.ballEvents;
+  if(!events.length){ball.hidden=true;return;}
   let lo=0,hi=events.length;
   while(lo<hi){const mid=(lo+hi)>>1;if(events[mid].time<=t)lo=mid+1;else hi=mid;}
-  const previous=events[lo-1],next=events[lo];
-  if(!previous||previous.li!==lineIndex){ball.hidden=true;return;}
-  const from=landing(previous.wi),to=next?.li===lineIndex?landing(next.wi):from;
+  const index=Math.max(0,lo-1),previous=events[index];
+  const next=events[Math.min(index+1,events.length-1)];
+  const from=landingFor(previous.li,previous.wi);
+  const to=landingFor(next.li,next.wi)||from;
   if(!from||!to){ball.hidden=true;return;}
-  const end=next?.li===lineIndex?next.time:Math.min(state.data.lines[lineIndex].end,previous.time+60/state.bpm);
-  if(t>end+.02){ball.hidden=true;return;}
-  const length=Math.max(.01,end-previous.time);
-  const p=clamp((t-previous.time)/length,0,1);
-  // The x-coordinate changes THROUGHOUT the airborne arc, not along the baseline.
-  const eased=p*p*(3-2*p);
-  const x=from.x+(to.x-from.x)*eased;
-  const height=state.settings.bounce*Math.min(1.45,Math.max(.65,length/(60/state.bpm)));
-  const y=from.y+(to.y-from.y)*p-4*p*(1-p)*height-state.settings.ballSize/2;
-  ball.hidden=false;ball.style.opacity='1';ball.style.transform='translate(-50%,-50%) scale(1)';
-  ball.style.setProperty('--ball-x',x.toFixed(2)+'px');ball.style.setProperty('--ball-y',y.toFixed(2)+'px');
+  const size=setBallDiameter(from);
+  const duration=Math.max(.012,next.time-previous.time);
+  const phase=clamp((t-previous.time)/duration,0,1);
+  const ease=.5-.5*Math.cos(Math.PI*phase);
+  const x=from.x+(to.x-from.x)*ease;
+  const baseline=from.y+(to.y-from.y)*ease;
+  // Physical arc: the hop time is one note/rest until the next actual landing.
+  // For equal settings, an eighth-note hop rises EXACTLY half a quarter-note hop.
+  const noteBeats=duration/(60/state.bpm);
+  const modeScale={auto:1,low:.62,high:1.42,alternate:index%2===0?1.34:.68}[state.settings.jumpStyle||'auto']||1;
+  let height=state.settings.bounce*clamp(noteBeats,.25,1.5)*modeScale;
+  height=Math.min(height,$('#projection-content').clientHeight*.34);
+  // y(t) starts at the previous word, reaches its apex mid-flight, and lands on
+  // the next word. No baseline-horizontal movement is possible.
+  const arc=4*phase*(1-phase);
+  const y=baseline-height*arc-size/2;
+  // Impact response is computed from seconds since landing, not from the frame
+  // rate. It elastically compresses and recovers on every note/beat, including
+  // the 4-beat sustained notes that repeatedly bounce above one glyph.
+  const since=Math.max(0,t-previous.time);
+  const contact=Math.max(0,1-since/.105);
+  const squash=.31*Math.pow(contact,1.25);
+  const scaleX=1+.32*squash/.31,scaleY=1-.27*squash/.31;
+  ball.hidden=false;
+  ball.style.opacity='1';
+  ball.style.setProperty('--ball-x',x.toFixed(2)+'px');
+  ball.style.setProperty('--ball-y',(y+size*.1*contact).toFixed(2)+'px');
+  ball.style.transform=`translate(-50%,-50%) scale(${scaleX.toFixed(3)},${scaleY.toFixed(3)})`;
+  ball.dataset.hopHeight=height.toFixed(2);
+  ball.dataset.hopDuration=duration.toFixed(4);
+  ball.dataset.fromLine=String(previous.li);
+  ball.dataset.toLine=String(next.li);
 }
 function renderAt(t){
   if(!state.data)return;
@@ -285,7 +353,7 @@ function renderAt(t){
     const line=state.data.lines[lineIndex];
     line.words.forEach((w,i)=>{if(time>=w.start&&time<w.end)activeWord=i;});
     const o=state.settings;
-    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id))?.id||(state.fx.has('ball-ink')?'fill-down':'none');
+    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id))?.id||'none';
     glyphs.forEach((el,i)=>{
       const w=line.words[i];if(!w)return;
       const onset=time-w.start,duration=w.end-w.start,p=clamp(onset/duration,0,1);
@@ -316,15 +384,13 @@ function renderAt(t){
       el.style.setProperty('--active',color);
       const glow=state.fx.has('glow')?(singing?o.shadow*1.8:o.shadow*.35):0;
       const shadow=state.fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
-      const shadows=[];
-      if(shadow>0)shadows.push(`1px 2px ${shadow.toFixed(1)}px #050b16`);
-      if(glow>0)shadows.push(`0 0 ${glow.toFixed(1)}px ${o.accentColor}`,`0 0 ${(glow*1.8).toFixed(1)}px ${o.accentColor}66`);
-      if(state.fx.has('trail')&&singing)shadows.push('-2px 0 #5fd9ff','2px 0 #e073f8');
-      el.style.setProperty('--letter-shadow',shadows.join(',')||'none');
+      const blur=Math.max(shadow,glow);
+      const trail=state.fx.has('trail')&&singing?',-2px 0 #5fd9ff,2px 0 #e073f8':'';
+      el.style.setProperty('--letter-shadow',blur?`0 0 ${blur.toFixed(1)}px ${o.accentColor}${trail}`:(trail?'-2px 0 #5fd9ff,2px 0 #e073f8':'none'));
       el.style.setProperty('--halo-scale',state.fx.has('halo')&&onset>=0?(1+Math.min(1,onset/.45)*1.15).toFixed(3):'0');
       el.style.setProperty('--halo-alpha',state.fx.has('halo')&&singing?Math.max(0,1-onset/.5).toFixed(3):'0');
       el.style.setProperty('--shimmer',state.fx.has('shimmer')?Math.max(0,Math.min(1,onset/.5))*170-35+'%':'-50%');
-      el.dataset.drawn=reveal;el.dataset.shimmer=state.fx.has('shimmer')?'true':'false';
+      el.dataset.drawn=reveal;
       const burst=(state.fx.has('spark')&&onset>=0&&onset<.3)?Math.max(0,1-onset/.3):0;
       el.style.setProperty('--spark-alpha',burst.toFixed(3));
       el.style.setProperty('--spark-radius',((1-burst)*.7).toFixed(3)+'em');
@@ -551,4 +617,3 @@ async function main(){
   initialized=true;
 }
 main();
-
