@@ -14,7 +14,7 @@
 | Web Motion Atlas | [開啟](https://christorng.idv.tw/ProjectionLabs/motion-atlas/) | [motion-atlas/](motion-atlas/) | 移植原有 48 種 CSS 單效果圖鑑，含強度／技術分類、收藏、時間軸、互動及捲動效果、能力偵測與獨立 HTML 下載。 |
 | 音樂動態實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/music-motion/) | [music-motion/](music-motion/) | 移植原有七類、64 種非空效果及 12 組預設。以音量、頻段、節奏控制 Canvas 背景、文字、光影與換頁；支援示範音樂、本機檔案、麥克風與無聲模擬。 |
 | 光的筆跡／詩歌手繪 | [開啟](https://christorng.idv.tw/ProjectionLabs/ink-song/) | [ink-song/](ink-song/) | 移植原有 80 秒、六段落的 SVG 詩歌播放器：逐筆落筆、色塊累積、場景延續、循環擦除，支援歌詞編輯、節拍音與繪畫／快轉倍率。 |
-| 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |\n| 逐字節拍同步 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) | [lyrics-beat-sync/](lyrics-beat-sync/) | 96 BPM 節拍與逐字時間碼、10 個可疊加效果、6 組預設、SRT / JSON 匯入匯出、Web Audio 逐拍圓球與長音重跳、獨立 HTML。 |
+| 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |\n| 逐字節拍同步 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) | [lyrics-beat-sync/](lyrics-beat-sync/) | 104 BPM 多種節奏示範、28 個獨立效果、11 組預設，採用 ASS 卡拉 OK 單檔逐音節時間、長音與休止匯入匯出。 |
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
@@ -106,17 +106,17 @@ ProjectionLabs/
 
 ## 逐字節拍同步實驗室
 
-[線上入口](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) · [示範歌詞 SRT](lyrics-beat-sync/demo.srt) · [逐字與音高時間碼 JSON](lyrics-beat-sync/demo-timing.json)
+[線上入口](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) · [ASS 卡拉 OK 示範歌詞](lyrics-beat-sync/demo.ass)
 
 - **連續八句，不留整頁空白**：104 BPM、4/4，八句各兩小節，共 36.923 秒，每句立即銜接。72 個字的音符時值分布包含十六分音群、半拍休止、二拍及四拍長音，各句旋律與節奏不同。
-- Web Audio 以逐字 `start/end/note` 排程有音高的示範旋律，搭配不同小節變化鼓點；也可下載完整旋律＋節奏 WAV，或匯入本機音樂檔同步。
+- Web Audio 依 ASS 音節時間排程合成示範旋律與不同小節變化鼓點；支援下載旋律＋節奏 WAV，或匯入本機音樂檔同步。ASS 不含標準的音高欄位，因此重新匯入時音高改採示範推導音階。
 - **28 個獨立效果，分五類**：字體色彩與彈性、上下左右位移、空心字水平／垂直／圓形／中央／斜向填入、彩色字墜入與四散碎片組合、裝飾光環／光點／底線，以及跳球與撞擊。
 - 每類都有「無效果」。揭露遮罩與球型效果在同類中互斥，其餘效果可跨類疊加，不將綁定的效果冒充獨立效果。
 - **11 組成套預設**：輕柔、明顯、誇張、現代、科幻、電影感、復古歌球、能量灌注、碎片重組、色彩墜入、全無效果。
 - 跳球以字元起音與長音內拍點建立事件序列，水平位移與垂直拋物線同時發生，跳到另一字時不會在最低點平移；長音仍在原字每拍重跳。落球爆裂及灌字為另兩種單項效果。
 - 可單獨調字體大小、放大幅度、水平／垂直偏移、顏色、陰影、描邊、底線、球大小和跳高。點選時間軸字元可定位到起音點。
-- SRT 只有每句的起迄時間；單獨匯入 SRT 的逐字時間**只能估算**，UI 會標記。含 `words` 的 JSON 才有逐字時間與長音資料；`note` 為示範旋律 MIDI 音高。
-- 純 HTML/CSS/JS，離線獨立播放器內嵌樣式、逐字 JSON 與聲音引擎，匯出可保留目前啟用的效果組合。
+- **單一 ASS 卡拉 OK 檔**：Dialogue 記錄整句起迄，`\k`、`\kf` 等標準標記以百分之一秒記錄每個音節的持續時間；空音節的 `\k` 表示句中休止。匯入後不再估算每字時間，沒有時間標記的普通 ASS Dialogue 將明確拒絕。
+- 純 HTML/CSS/JS，離線獨立播放器直接內嵌 ASS 字幕、樣式與聲音引擎，匯出可保留目前啟用的效果組合。
 
 ### 跳球的時值與跨頁運動（v3）
 
@@ -126,26 +126,29 @@ ProjectionLabs/
 - **連續跨頁**：預先量測每頁字形的固定位置，球沿同一段拋物線從前頁末字飛到後頁首字，歌詞 DOM 更新不會中斷球；播放循環時，最後一字同樣連回第一頁第一字。
 - **示範卡片**：球縮小並展示高低交錯的跳躍，避免與主播放器不同步的視覺印象。
 
-### 逐字 JSON 結構（示意）
+### 單檔 ASS 卡拉 OK 結構（v4）
 
-```json
-{
-  "bpm": 104,
-  "beatsPerBar": 4,
-  "duration": 36.923077,
-  "lines": [{
-    "text": "晨光穿過 夜色照我心",
-    "start": 0,
-    "end": 4.615385,
-    "words": [
-      {"text": "晨", "start": 0, "end": 0.144231, "note": 64},
-      {"text": "光", "start": 0.144231, "end": 0.288462, "note": 67}
-    ]
-  }]
-}
-```
+本頁已改為只匯入、匯出 .ass 歌詞；[demo.ass](lyrics-beat-sync/demo.ass) 是完整可在 Aegisub 等 ASS 字幕編輯器使用的範例。
 
-BPM 變動時，僅在內建示範資料的對齊模式下同步縮放其起迄；匯入自己的精確 JSON 不會擅自移動字的時間碼。時間軸為媒體秒數，不用每個畫格累積計時，避免播放延遲逐漸漂移。
+\`\`\`ass
+[Script Info]
+Title: 逐字節拍歌詞
+ScriptType: v4.00+
+; BPM: 104
+; BeatsPerBar: 4
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:02.88,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf50}光{\kf188}芒
+\`\`\`
+
+- \`{\kf25}\` 表示該音節 0.25 秒的左至右卡拉 OK 填色時間；\`{\k50}\` 不附文字代表休止 0.5 秒；\`{\kf188}\` 是延長 1.88 秒。
+- 時間精度為 0.01 秒。ASS 能精確交換音節的開始和持續時間，但不是完整記譜格式，無法標準化交換 MIDI 音高、節拍器 BPM 與拍號。
+- \`; BPM:\`、\`; BeatsPerBar:\`、\`; BeatOffset:\` 是本工具用的**選填註解**，不是 ASS 卡拉 OK 標準欄位；其他 ASS 軟體可安全忽略。
+- ASS 的傳統 \`\\k\`、\`\\K\`、\`\\kf\`、\`\\ko\` 均可讀取；頁面將每個標記的文字當成可動畫化的音節，支援單個中文字和多字母音節。其餘 ASS 排版特效不由本實驗室直接複製。
+- 載入自己的 ASS 後，BPM 滑桿只影響拍點，不擅自拉伸原有逐字時間；內建示範修改 BPM 才會按音樂比例縮放。
+- 下載的獨立 HTML 內嵌 ASS 內容，無需在瀏覽器旁放第二份 JSON。
+
 
 ## 設計與技術參考
 
