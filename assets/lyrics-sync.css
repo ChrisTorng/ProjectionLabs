@@ -105,3 +105,30 @@
 .lyric-metric-probe{position:absolute!important;left:50%!important;top:50%!important;width:max-content!important;max-width:100%!important;transform:translate(-50%,-50%) translateY(-1%)!important;visibility:hidden!important;pointer-events:none!important;white-space:nowrap!important}
 .sing-ball{transform-origin:center bottom;z-index:4}
 .ball-help{margin:10px 0 0;color:#aabbd1;font-size:.82rem;line-height:1.55}
+
+/* V6: genuine synchronized four-word cards, not independent CSS mock animations. */
+.mini-transport{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 17px;margin:0 0 16px;border-radius:13px;border:1px solid #426474;background:#102332}
+.mini-transport-heading{display:flex;flex-direction:column;gap:2px}.mini-transport-heading strong{color:#dcf5f1;font-size:1rem}.mini-transport-heading span{font-size:.84rem;color:#aebfd0}
+.mini-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.mini-actions button{padding:7px 11px;min-height:35px;font-size:.83rem}
+.mini-counter{color:#8be8da;font-size:.84rem;margin-right:6px}.mini-counter b{font-variant-numeric:tabular-nums}
+.fx-group-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.fx-card{min-height:185px;gap:10px}
+.karaoke-preview.fx-preview,.karaoke-preview.preset-card-preview{height:116px;min-height:116px;padding:13px 8px 17px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;container-type:inline-size;
+ background:radial-gradient(ellipse at 50% 110%,color-mix(in srgb,var(--highlight,#72cfbd) 22%,transparent),transparent 76%),#091827}
+.karaoke-preview.preset-card-preview{height:145px;min-height:145px}
+.karaoke-preview.preset-card-preview:before{pointer-events:none}
+.karaoke-preview .mini-lyrics{display:flex;align-items:center;justify-content:center;position:relative;isolation:isolate;white-space:nowrap;width:max-content;max-width:100%;padding:0;margin:0;font:800 clamp(23px,10cqw,34px)/1.55 'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;letter-spacing:0}
+.karaoke-preview .mini-glyph{position:relative;min-width:1em;white-space:nowrap;text-align:center;will-change:transform;line-height:1.4}
+.karaoke-preview .mini-glyph .glyph-outline{color:var(--inactive,#c7d3e3)}
+.karaoke-preview .mini-glyph[data-drawn=none] .glyph-outline{color:var(--active,var(--inactive))}
+.karaoke-preview .mini-glyph .glyph-solid{color:var(--active,var(--highlight));text-shadow:var(--letter-shadow,none)}
+.karaoke-preview .mini-glyph[data-drawn=none] .glyph-solid{opacity:0}
+.karaoke-preview .mini-glyph .underline{bottom:3px}
+.karaoke-preview .mini-ball{position:absolute;left:0;top:0;z-index:5;display:block;border:1px solid #fff9;border-radius:50%;background:radial-gradient(circle at 28% 25%,#fff,var(--highlight,#85e8da) 55%,#327c98);box-shadow:0 0 9px var(--highlight,#85e8da);pointer-events:none}
+.karaoke-preview .mini-ball[hidden],.karaoke-preview .mini-impact[hidden]{display:none!important}
+.karaoke-preview .mini-impact{position:absolute;left:0;top:0;width:8px;height:8px;z-index:4;transform:translate(-50%,-50%);border-radius:50%;border:2px solid var(--highlight,#85e8da);box-shadow:0 0 var(--mini-burst,8px) 2px var(--highlight,#85e8da);pointer-events:none}
+.karaoke-preview .mini-beats{position:absolute;left:0;right:0;bottom:6px;display:flex;align-items:center;justify-content:center;gap:12px;z-index:6;pointer-events:none}
+.karaoke-preview .mini-beats b{width:6px;height:6px;border-radius:100px;background:#658094;opacity:.5;transition:none}
+.karaoke-preview .mini-beats b.on{background:var(--highlight,#85e8da);opacity:1;box-shadow:0 0 8px var(--highlight,#85e8da);transform:scale(1.3)}
+@media(max-width:980px){.fx-group-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.fx-group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.karaoke-preview.fx-preview{height:108px;min-height:108px}.karaoke-preview.preset-card-preview{height:124px;min-height:124px}.mini-actions{width:100%}}
