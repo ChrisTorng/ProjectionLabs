@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="依 SRT 與逐字時間碼，由快音群、休止、四拍長音與逐字精確時間碼控制 28 個獨立效果，可分類疊加及套用 11 組風格。">
+  <meta name="description" content="依 ASS 卡拉 OK 單一歌詞檔，由快音群、休止、四拍長音與逐字精確時間碼控制 28 個獨立效果，可分類疊加及套用 11 組風格。">
   <title>逐字節拍同步效果實驗室 · ProjectionLabs</title>
   
   
   
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="../assets/theme.css">
-  <link rel="stylesheet" href="../assets/lyrics-sync.css?v=3"></head>
+  <link rel="stylesheet" href="../assets/lyrics-sync.css?v=4"></head>
 <body>
 <header class="site-header"><div class="container header-inner">
   <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">P</span>ProjectionLabs</a>
@@ -20,7 +20,7 @@
   <div class="page-title"><p class="overline">LYRICS / BEAT-SYNCED TYPOGRAPHY</p><h1>逐字節拍同步效果實驗室</h1><p>連續八句、每句不同旋律和節奏：十六分音群、句中休止、二拍與四拍長音。28 種單項效果可獨立疊加，各類提供「無效果」，11 組預設可直接比較。</p></div>
   <div class="sync-layout">
     <section class="work-area" aria-label="逐字歌詞投影預覽">
-      <div class="section-top"><div><span class="eyebrow">LIVE OUTPUT · 16:9</span><h2>即時投影預覽 <span class="status" id="alignment-status">手工逐字對位</span></h2></div><span class="mono" id="clock-readout">00:00.000 / 00:36.923</span></div>
+      <div class="section-top"><div><span class="eyebrow">LIVE OUTPUT · 16:9</span><h2>即時投影預覽 <span class="status" id="alignment-status">ASS 卡拉 OK 時值</span></h2></div><span class="mono" id="clock-readout">00:00.000 / 00:36.923</span></div>
       <div class="projection" id="projection" role="region" aria-label="逐字歌詞畫面">
         <div class="projection-ambient"></div>
         <div class="projection-content" id="projection-content"><div class="projection-lyrics" id="projection-lyrics"></div><div id="ball" class="sing-ball" hidden></div><div id="impact" class="ball-impact" hidden aria-hidden="true"><i style="--a:0deg"></i><i style="--a:45deg"></i><i style="--a:90deg"></i><i style="--a:135deg"></i><i style="--a:180deg"></i><i style="--a:225deg"></i><i style="--a:270deg"></i><i style="--a:315deg"></i></div></div>
@@ -56,20 +56,20 @@
       </section>
       <section class="control-panel"><div class="panel-heading"><h2>資料與對位</h2><span class="hint-text">全部只在本機處理</span></div>
         <div class="stats-row"><span><strong>104</strong><small>BPM</small></span><span><strong>4/4</strong><small>拍號</small></span><span><strong id="word-count">72</strong><small>歌詞字數</small></span></div>
-        <div class="import-grid"><label class="file-picker">載入 SRT<input type="file" id="srt-file" accept=".srt,text/plain"></label><label class="file-picker">載入逐字 JSON<input type="file" id="json-file" accept=".json,application/json"></label><label class="file-picker full">載入自己的音樂檔<input type="file" id="audio-file" accept="audio/*"></label></div>
+        <div class="import-grid"><label class="file-picker full">載入 ASS 卡拉 OK 歌詞<input type="file" id="ass-file" accept=".ass,.ssa,text/plain"></label><label class="file-picker full">載入自己的音樂檔<input type="file" id="audio-file" accept="audio/*"></label></div>
         <label class="ctrl"><span>節拍速度 <output id="bpm-val">104 BPM</output></span><input id="bpm" type="range" min="70" max="180" step="1"></label>
-        <div class="download-grid"><button type="button" id="download-srt">下載 SRT</button><button type="button" id="download-json">下載逐字時間碼</button><button type="button" id="download-audio">下載旋律＋節奏 WAV</button><button type="button" id="download-html">下載獨立 HTML</button></div>
-        <div class="hint-box" id="data-note">SRT 只有每句起迄；精確逐字時間與長音請使用 JSON。匯入一般 SRT 時，系統會先以均分方式產生<b>估算</b>的逐字時間，並明確標示。</div>
+        <div class="download-grid"><button type="button" id="download-ass">下載 ASS 逐字歌詞</button><button type="button" id="download-audio">下載旋律＋節奏 WAV</button><button type="button" id="download-html">下載獨立 HTML</button></div>
+        <div class="hint-box" id="data-note">使用單一 ASS 檔案即可記錄整句時間、每個字的時值與休止；不再分別匯入 SRT 和逐字 JSON。</div>
       </section>
     </aside>
   </div>
   <section class="browse-section" aria-label="獨立文字效果"><div class="section-top"><div><span class="eyebrow">EFFECT LAYERS / MULTI-SELECT</span><h2>單項效果測試</h2></div><p>28 種可逐項啟用；每類都有「無效果」。字面遮罩與球型效果單選，其他分類自由疊加。</p></div><div class="fx-grid" id="fx-grid"></div></section>
   <section class="browse-section" aria-label="預設成組效果"><div class="section-top"><div><span class="eyebrow">PRESET COMBINATIONS / ONE CLICK</span><h2>預設組合預覽</h2></div><p>11 組有意義的效果鏈；點選後主預覽立即切換。</p></div><div class="preset-grid" id="preset-grid"></div></section>
-  <div class="footnote">示範音訊是無人聲的合成音符與變化鼓點，文字精確對應其起音與時值。104 BPM，八句各兩小節，從 00:00 起立即有字，最後一字結束即停止；句中休止仍保留文字。圓球按音符時值決定跳高，落下壓扁再回彈；跨頁保持連續飛行，不會瞬間跳位或消失。</div>
+  <div class="footnote">示範音訊是無人聲的合成音符與變化鼓點，ASS 字幕以百分之一秒精度記錄每個音節時值，文字精確對應其起音與時值。104 BPM，八句各兩小節，從 00:00 起立即有字，最後一字結束即停止；句中休止仍保留文字。圓球按音符時值決定跳高，落下壓扁再回彈；跨頁保持連續飛行，不會瞬間跳位或消失。</div>
 </main>
 <footer class="site-footer"><div class="container footer-inner"><span>ProjectionLabs · 歌詞節拍同步原型</span><a href="https://github.com/ChrisTorng/ProjectionLabs">GitHub 原始碼</a></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script type="module" src="../assets/lyrics-sync.js?v=3"></script>
+<script type="module" src="../assets/lyrics-sync.js?v=4"></script>
 </body>
 </html>
