@@ -1,6 +1,6 @@
 # ProjectionLabs
 
-七個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
+八個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
 
 **網站入口：[christorng.idv.tw/ProjectionLabs/](https://christorng.idv.tw/ProjectionLabs/)**
 
@@ -14,11 +14,11 @@
 | Web Motion Atlas | [開啟](https://christorng.idv.tw/ProjectionLabs/motion-atlas/) | [motion-atlas/](motion-atlas/) | 移植原有 48 種 CSS 單效果圖鑑，含強度／技術分類、收藏、時間軸、互動及捲動效果、能力偵測與獨立 HTML 下載。 |
 | 音樂動態實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/music-motion/) | [music-motion/](music-motion/) | 移植原有七類、64 種非空效果及 12 組預設。以音量、頻段、節奏控制 Canvas 背景、文字、光影與換頁；支援示範音樂、本機檔案、麥克風與無聲模擬。 |
 | 光的筆跡／詩歌手繪 | [開啟](https://christorng.idv.tw/ProjectionLabs/ink-song/) | [ink-song/](ink-song/) | 移植原有 80 秒、六段落的 SVG 詩歌播放器：逐筆落筆、色塊累積、場景延續、循環擦除，支援歌詞編輯、節拍音與繪畫／快轉倍率。 |
-| 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |
+| 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |\n| 逐字節拍同步 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) | [lyrics-beat-sync/](lyrics-beat-sync/) | 96 BPM 節拍與逐字時間碼、10 個可疊加效果、6 組預設、SRT / JSON 匯入匯出、Web Audio 逐拍圓球與長音重跳、獨立 HTML。 |
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
-共 **7 個獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
+共 **8 個獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
 
 ## 既有成品的移植範圍
 
@@ -96,13 +96,42 @@ ProjectionLabs/
 ├── motion-atlas/index.html # 原有單效果圖鑑
 ├── music-motion/index.html # 音樂反應圖層
 ├── ink-song/index.html   # 詩歌手繪播放器
-├── lyrics/index.html    # 歌詞文字
+├── lyrics/index.html    # 歌詞文字\n├── lyrics-beat-sync/index.html # 逐字節拍同步
 ├── transitions/index.html
 ├── backgrounds/index.html
 └── assets/              # 共用介面、場景與各實驗室效果定義
 ```
 
 新增實驗室時，建立 `<lab-id>/index.html` 與 `assets/<lab-id>.js`，在 `assets/catalog.js` 登錄，再同步首頁與本 README 的入口、簡介及效果數量。
+
+## 逐字節拍同步實驗室
+
+新增 `lyrics-beat-sync/`，延續純靜態原生 JS、CSS 與既有視覺樣式。
+
+- 內建 96 BPM、4/4、45 秒乾聲節拍示範：前奏一小節，八句歌詞各二小節，尾奏一小節。利用 Web Audio 將音訊事件排程到 AudioContext 時鐘，畫面以相同時間軸呈現；也能直接下載 WAV 節拍。
+- 提供 [demo.srt](lyrics-beat-sync/demo.srt)（整句時間）及 [demo-timing.json](lyrics-beat-sync/demo-timing.json)（59 個字的 start/end 秒數，包含跨拍長音）。
+- **SRT 本身沒有每字時間碼**：只匯入 SRT 時採等時分配估算，會標記「逐字時間為估算」；匯入逐字 JSON 才能表現精確的實際起音與長音。
+- 十個可獨立切換的效果：逐字放大、唱到變色、陰影、底線、節拍圓球、空心轉實心、上浮、光暈、節拍脈衝、數位色彩殘影。六組預設：輕柔、明顯、誇張、現代、科幻、電影感。
+- 可以調整字體大小、縮放、顏色、陰影、描邊、底線、圓球大小與跳高，並在逐字時間軸按字跳轉。支援匯入本機音樂，以音樂播放器的 currentTime 帶動相同的逐字動畫。
+- 匯入資料留在瀏覽器本機；匯出的獨立 HTML 內嵌 CSS、JS 和目前逐字時間碼，在 `file://` 下仍可播放內建 Web Audio 節拍。
+
+### 逐字 JSON 結構
+
+```json
+{
+  "bpm": 96,
+  "beatsPerBar": 4,
+  "duration": 45,
+  "lines": [{
+    "text": "祢的光 照亮我心",
+    "start": 2.5,
+    "end": 7.5,
+    "words": [{"text": "祢", "start": 2.5, "end": 2.96875}]
+  }]
+}
+```
+
+節拍跳球以 `bpm` 和全域 `beatOffset` 產生多次上拋、回落，長音字維持在同一字上方。修改範例 BPM 時，示範逐字時間碼也同比例縮放；匯入自己的逐字 JSON 時，改變 BPM 只調整節拍格線，不會偷改已對好的字時間碼。
 
 ## 設計與技術參考
 
