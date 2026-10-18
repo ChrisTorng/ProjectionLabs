@@ -1,0 +1,25 @@
+[Script Info]
+Title: 流動節拍逐字歌詞示範（八句八種節奏）
+ScriptType: v4.00+
+WrapStyle: 2
+PlayResX: 1920
+PlayResY: 1080
+ScaledBorderAndShadow: yes
+; BPM: 104
+; BeatsPerBar: 4
+; BeatOffset: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Noto Sans TC,85,&H00FFFFFF,&H00808080,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,5,40,40,40,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:04.62,Default,,0,0,0,,{\kf14}晨{\kf15}光{\kf29}穿{\kf29}過\h{\kf28}夜{\kf29}色{\kf29}照{\kf58}我{\kf231}心
+Dialogue: 0,0:00:04.62,0:00:09.23,Default,,0,0,0,,{\kf28}風{\kf15}雨{\kf14}中\h{\k29}{\kf29}祢{\kf29}仍{\kf29}與{\kf28}我{\k29}{\kf58}同{\kf173}行
+Dialogue: 0,0:00:09.23,0:00:13.85,Default,,0,0,0,,{\kf15}我{\kf14}要{\kf14}勇{\kf15}敢\h{\kf29}跨{\kf28}越{\kf58}每{\kf58}道{\kf231}浪
+Dialogue: 0,0:00:13.85,0:00:18.46,Default,,0,0,0,,{\kf57}在{\kf58}安{\kf29}靜{\k29}{\kf29}裡\h{\kf14}聽{\kf14}見{\kf29}祢{\kf87}呼{\kf115}喚
+Dialogue: 0,0:00:18.46,0:00:23.08,Default,,0,0,0,,{\kf15}喜{\kf14}樂{\kf14}像{\kf15}泉{\kf14}水\h{\kf15}湧{\kf29}流{\kf115}不{\kf231}息
+Dialogue: 0,0:00:23.08,0:00:27.69,Default,,0,0,0,,{\kf29}微{\kf28}光{\kf29}也{\kf29}能\h{\kf58}照{\kf57}亮{\kf58}遠{\kf58}方{\kf115}路
+Dialogue: 0,0:00:27.69,0:00:32.31,Default,,0,0,0,,{\kf29}張{\kf29}開{\kf14}雙{\kf15}手\h{\kf29}領{\kf28}受{\kf29}新{\kf58}恩{\kf231}典
+Dialogue: 0,0:00:32.31,0:00:36.92,Default,,0,0,0,,{\kf57}直{\kf15}到{\kf14}永{\kf29}遠\h{\kf29}都{\kf29}為{\kf58}祢{\kf57}歌{\kf173}唱
