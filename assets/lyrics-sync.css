@@ -100,3 +100,5 @@
 @media(max-width:1200px){.fx-group-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:750px){.fx-group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fx-group-header{display:block}.fx-group-header p{margin-top:4px}}
 @media(prefers-reduced-motion:reduce){.fx-preview *,.preset-card-preview *{animation:none!important}}
+
+.glyph[data-shimmer=true]::before{content:attr(data-char);position:absolute;inset:0;color:transparent;background:linear-gradient(90deg,transparent 8%,#ffffffdf 48%,transparent 78%);background-size:180% 100%;background-position:var(--shimmer,-50%) 50%;-webkit-background-clip:text;background-clip:text;pointer-events:none;z-index:4}
