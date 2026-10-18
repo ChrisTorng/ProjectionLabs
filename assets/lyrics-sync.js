@@ -10,11 +10,12 @@ const secText = value => {
   const milliseconds = Math.floor((t - Math.floor(t)) * 1000 + 0.0001);
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
 };
-const cuesTime = t => {
-  const ms = Math.round(t * 1000);
-  const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')},${String(ms%1000).padStart(3,'0')}`;
+const assTime = t => {
+  const cs = Math.max(0,Math.round(t*100));
+  const h=Math.floor(cs/360000),m=Math.floor(cs/6000)%60,s=Math.floor(cs/100)%60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs%100).padStart(2,'0')}`;
 };
+
 const GROUPS = [
  {id:'appearance', title:'01 · 字體與色彩', desc:'每一項皆可獨立疊加，放大、變色、陰影、淡入淡出互不綁定。'},
  {id:'movement', title:'02 · 位置與動作', desc:'左右、上下移動及彈性變形可與其他層共同執行。'},
@@ -153,12 +154,10 @@ function useData(data,alignment='precise'){
   state.position=0;state.displayedLine=-2;state.activeWord=-2;
   $('#bpm').value=state.bpm;$('#bpm-val').textContent=state.bpm+' BPM';
   $('#seek').max=state.duration;$('#seek').value=0;
-  const estimate=alignment==='estimated';
-  const badge=$('#alignment-status');badge.textContent=estimate?'逐字時間為估算':alignment==='manual-demo'?'手工逐字對位':'精確逐字時間碼';badge.classList.toggle('estimated',estimate);
+  const badge=$('#alignment-status');badge.textContent=alignment==='manual-demo'?'ASS 示範逐字對位':'ASS 卡拉 OK 精準時間';badge.classList.remove('estimated');
   $('#word-count').textContent=state.data.lines.reduce((n,l)=>n+l.words.length,0);
   $('#stage-counter').textContent=`${state.bpm} BPM · ${state.beatsPerBar}/4`;
-  if(estimate)$('#data-note').innerHTML='目前載入的是一般 <b>SRT</b>，只有整句時間；逐字時間是<b>線性估算</b>，並不是辨識到的實際演唱起音。請載入精確 JSON 取代。';
-  else $('#data-note').textContent='已載入含逐字 start/end 的時間碼。長音字跨越多拍時，圓球會以拍點在原字上方重複跳動；節拍與歌詞共用時間軸。';
+  $('#data-note').innerHTML='單一 <b>ASS</b> 檔案包含整句起迄、每個音節的 <code>\\kf</code> 時值，以及空音節休止。匯入後依精確音節時間驅動效果；無須 SRT 或外部 JSON。BPM 註解是本實驗室額外使用的選填資訊。';
   landingCache.clear();rebuildEvents();buildTimeline();renderAt(0);
 }
 function buildTimeline(){
@@ -179,13 +178,26 @@ function buildTimeline(){
   });
 }
 function currentLineIndex(t){const lines=state.data.lines;for(let i=0;i<lines.length;i++)if(t>=lines[i].start&&t<lines[i].end)return i;return -1;}
+// Split displayed text into the original timed ASS syllables and untimed separators.
+// Supports one Chinese character per syllable as well as multi-character English words.
+function lineParts(line){
+  const parts=[];let offset=0;
+  line.words.forEach((w,wi)=>{
+    const index=line.text.indexOf(w.text,offset);
+    if(index<0)throw Error(`歌詞「${line.text}」找不到 ASS 音節「${w.text}」`);
+    if(index>offset)parts.push({text:line.text.slice(offset,index),wi:-1});
+    parts.push({text:w.text,wi});offset=index+w.text.length;
+  });
+  if(offset<line.text.length)parts.push({text:line.text.slice(offset),wi:-1});
+  return parts;
+}
 function buildStage(index){
   const stage=$('#projection-lyrics');stage.replaceChildren();glyphs=[];
   if(index<0){stage.textContent='';return;}
-  const line=state.data.lines[index];let wi=0;
-  for(const ch of Array.from(line.text)){
-    if(/^\s$/u.test(ch)){const s=document.createElement('span');s.className='glyph space';s.textContent=' ';stage.append(s);continue;}
-    const word=line.words[wi++];if(!word)break;
+  const line=state.data.lines[index];
+  for(const part of lineParts(line)){
+    const ch=part.text;
+    if(part.wi<0){const s=document.createElement('span');s.className='glyph space';s.textContent=ch;stage.append(s);continue;}
     const span=document.createElement('span');span.className='glyph';
     const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id));
     span.dataset.drawn=reveal?reveal.id:'none';
@@ -232,10 +244,10 @@ function landingFor(li,wi){
     const probe=document.createElement('div');
     probe.className='projection-lyrics lyric-metric-probe';
     probe.setAttribute('aria-hidden','true');
-    for(const ch of Array.from(line.text)){
+    for(const part of lineParts(line)){
       const glyph=document.createElement('span');
-      glyph.className=/^\s$/u.test(ch)?'glyph space':'glyph';
-      glyph.textContent=ch;
+      glyph.className=part.wi<0?'glyph space':'glyph';
+      glyph.textContent=part.text;
       probe.append(glyph);
     }
     content.append(probe);
@@ -492,25 +504,100 @@ function seekTo(value){
   renderAt(t);
 }
 function toggleClick(){state.clicks=!state.clicks;$('#click-toggle').setAttribute('aria-pressed',String(state.clicks));$('#click-toggle').textContent='伴奏：'+(state.clicks?'開':'關');if(!state.clicks)stopSources();}
-function parseSrt(text){
-  const blocks=text.replace(/^\uFEFF/,'').replace(/\r/g,'').split(/\n\s*\n/);
-  const lines=[];const re=/(\d\d):(\d\d):(\d\d)[,.](\d{1,3})/g;
-  const seconds=s=>{const m=Array.from(s.matchAll(re))[0];return m?Number(m[1])*3600+Number(m[2])*60+Number(m[3])+Number(m[4].padEnd(3,'0'))/1000:NaN;};
-  for(const block of blocks){const rows=block.trim().split('\n');const idx=rows.findIndex(r=>r.includes('-->'));if(idx<0)continue;
-    const halves=rows[idx].split('-->');const start=seconds(halves[0]),end=seconds(halves[1]);const lyric=rows.slice(idx+1).join(' ').replace(/<[^>]*>/g,'').trim();
-    if(lyric&&Number.isFinite(start)&&Number.isFinite(end)&&end>start)lines.push({text:lyric,start,end});
+// Advanced SubStation Alpha (ASS) karaoke import. Durations are in centiseconds.
+// The optional BPM/BeatsPerBar/BeatOffset comment metadata is local to this app;
+ // karaoke tags and Dialogue timing remain standard ASS.
+function parseAss(source){
+  const text=String(source).replace(/^\uFEFF/,'').replace(/\r/g,'');
+  if(!/^\[Script Info\]/im.test(text)||!/^\[Events\]/im.test(text))throw Error('不是有效 ASS：缺少 [Script Info] 或 [Events]');
+  const readMeta=(label,defaultValue)=>{
+    const match=text.match(new RegExp('^\\s*;\\s*'+label+'\\s*[:=]\\s*([-+\\d.]+)','im'));
+    return match?Number(match[1]):defaultValue;
+  };
+  const title=text.match(/^Title\s*:\s*(.+)$/im)?.[1]?.trim()||'ASS 卡拉 OK 歌詞';
+  const bpm=readMeta('BPM',state.bpm||104),beatsPerBar=readMeta('BeatsPerBar',state.beatsPerBar||4),beatOffset=readMeta('BeatOffset',0);
+  const assSec=stamp=>{
+    const m=stamp.trim().match(/^(\d+):(\d{1,2}):(\d{1,2})\.(\d{1,3})$/);
+    if(!m)throw Error('ASS 時間格式錯誤：'+stamp);
+    return Number(m[1])*3600+Number(m[2])*60+Number(m[3])+Number(m[4])/10**m[4].length;
+  };
+  let section='',format=[],lines=[];
+  for(const row of text.split('\n')){
+    const line=row.trim();
+    if(/^\[[^\]]+\]$/.test(line)){section=line.toLowerCase();continue;}
+    if(section!=='[events]')continue;
+    if(/^Format\s*:/i.test(line)){format=line.replace(/^Format\s*:/i,'').split(',').map(x=>x.trim().toLowerCase());continue;}
+    if(!/^Dialogue\s*:/i.test(line))continue;
+    if(!format.length)throw Error('ASS [Events] 缺少 Format 欄位');
+    const src=row.replace(/^\s*Dialogue\s*:/i,'');
+    const fields=[];let remain=src;
+    for(let i=0;i<format.length-1;i++){
+      const pos=remain.indexOf(',');if(pos<0)throw Error('Dialogue 欄位數不足');
+      fields.push(remain.slice(0,pos));remain=remain.slice(pos+1);
+    }
+    fields.push(remain);
+    const byName=name=>fields[format.indexOf(name)];
+    if(format.at(-1)!=='text')throw Error('目前要求 ASS 的 Text 是最後一欄（Aegisub 標準排列）');
+    const start=assSec(byName('start')||''),end=assSec(byName('end')||'');
+    if(end<=start)continue;
+    const input=byName('text')||'';
+    let cursor=0,shown='',words=[],count=0,found=false;
+    // Capture each override block and the following lyric characters.
+    const re=/\{([^{}]*)\}([^{}]*)/g;
+    let m,previousEnd=0;
+    while((m=re.exec(input))!==null){
+      if(m.index>previousEnd)shown+=input.slice(previousEnd,m.index).replace(/\\h/g,' ').replace(/\\N/g,' ');
+      previousEnd=re.lastIndex;
+      const tags=m[1],syllable=m[2].replace(/\\h/g,' ').replace(/\\N/g,' ');
+      const timeTag=[...tags.matchAll(/\\(?:kf|ko|kt|k|K)(\d+)/g)];
+      const absolute=timeTag.find(a=>a[0].startsWith('\\kt'));
+      if(absolute)cursor=Number(absolute[1]);
+      const duration=timeTag.filter(a=>!a[0].startsWith('\\kt')).at(-1);
+      if(!duration){shown+=syllable;continue;}
+      found=true;const cs=Number(duration[1]);
+      const clean=syllable.trim();shown+=syllable;
+      if(clean&&cs>0){
+        const ws=start+cursor/100,we=Math.min(end,start+(cursor+cs)/100);
+        if(we>ws)words.push({text:clean,start:Number(ws.toFixed(4)),end:Number(we.toFixed(4))});
+        count++;
+      }
+      cursor+=cs;
+    }
+    if(previousEnd<input.length)shown+=input.slice(previousEnd).replace(/\\h/g,' ').replace(/\\N/g,' ');
+    if(!found)throw Error(`第 ${lines.length+1} 句缺少 ASS 卡拉 OK \\k 時值；無法推算逐字時間`);
+    if(words.length)lines.push({text:shown.trim(),start,end,words,rhythm:''});
   }
-  if(!lines.length)throw Error('SRT 沒有有效的字幕時間碼');
-  return {title:'匯入 SRT',bpm:state.bpm,beatsPerBar:state.beatsPerBar,beatOffset:0,duration:Math.max(...lines.map(l=>l.end)),lines};
+  if(!lines.length)throw Error('ASS 沒有有效的 Dialogue 卡拉 OK 歌詞');
+  const duration=Math.max(...lines.map(l=>l.end));
+  return {title,bpm,beatsPerBar,beatOffset,duration,lines};
+}
+function exportAss(data=state.data){
+  const cs=t=>Math.max(0,Math.round(t*100));
+  const output=['[Script Info]',`Title: ${data.title||'逐字歌詞'}`,'ScriptType: v4.00+','WrapStyle: 2','PlayResX: 1920','PlayResY: 1080',
+    `; BPM: ${data.bpm??state.bpm}`,`; BeatsPerBar: ${data.beatsPerBar??state.beatsPerBar}`,`; BeatOffset: ${data.beatOffset??state.beatOffset}`,
+    '','[V4+ Styles]','Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
+    'Style: Default,Noto Sans TC,85,&H00FFFFFF,&H00808080,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,5,40,40,40,1','',
+    '[Events]','Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'];
+  for(const line of data.lines){
+    let lineText='',cursor=cs(line.start),index=0;
+    for(const word of line.words){
+      const found=line.text.indexOf(word.text,index);
+      if(found<0)throw Error('ASS 匯出失敗：歌詞與時間碼不一致');
+      lineText+=line.text.slice(index,found).replace(/ /g,'\\h');
+      const start=cs(word.start),end=Math.max(start+1,cs(word.end));
+      if(start>cursor)lineText+=`{\\k${start-cursor}}`;// Empty syllable: explicit rest, no extra visible glyph.
+      lineText+=`{\\kf${end-start}}`+word.text;
+      cursor=end;index=found+word.text.length;
+    }
+    lineText+=line.text.slice(index).replace(/ /g,'\\h');
+    output.push(`Dialogue: 0,${assTime(line.start)},${assTime(line.end)},Default,,0,0,0,,${lineText}`);
+  }
+  return output.join('\r\n')+'\r\n';
 }
 function downloadText(text,name,mime){
   const url=URL.createObjectURL(new Blob([text],{type:mime}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
-function downloadSrt(){const text=state.data.lines.map((l,i)=>`${i+1}\r\n${cuesTime(l.start)} --> ${cuesTime(l.end)}\r\n${l.text}\r\n`).join('\r\n');downloadText('\uFEFF'+text,'lyrics-demo.srt','text/plain;charset=utf-8');}
-function downloadJson(){
-  const result={...state.data,bpm:state.bpm,beatsPerBar:state.beatsPerBar,beatOffset:state.beatOffset,duration:state.duration,alignment:state.wordAlignment};
-  downloadText(JSON.stringify(result,null,2),'lyrics-word-timing.json','application/json;charset=utf-8');
-}
+function downloadAss(){downloadText('\uFEFF'+exportAss({...state.data,bpm:state.bpm,beatsPerBar:state.beatsPerBar,beatOffset:state.beatOffset}),'lyrics-karaoke.ass','text/plain;charset=utf-8');}
 function generateWav(){
   const rate=22050,frames=Math.ceil(state.duration*rate),buf=new Float32Array(frames),step=60/state.bpm;
   function add(at,dur,callback){const start=Math.round(at*rate),n=Math.min(frames-start,Math.round(dur*rate));for(let i=0;i<n;i++)buf[start+i]+=callback(i/rate,i/n);}
@@ -529,10 +616,10 @@ function generateWav(){
   for(let i=0;i<frames;i++)view.setInt16(44+i*2,Math.round(clamp(buf[i],-1,1)*32767),true);
   downloadText(bytes,`melody-rhythm-${state.bpm}bpm.wav`,'audio/wav');
 }
-async function importFile(input,kind){
+async function importAssFile(input){
   const file=input.files?.[0];if(!file)return;
-  try{const text=await file.text();const result=kind==='srt'?parseSrt(text):JSON.parse(text);useData(result,kind==='srt'?'estimated':'precise');toast(kind==='srt'?'SRT 匯入完成；逐字為估算':'精確逐字 JSON 匯入完成');}
-  catch(e){toast('匯入失敗：'+e.message);}finally{input.value='';}
+  try{const data=parseAss(await file.text());state.originalDemo=null;useData(data,'precise');toast('已載入 ASS：'+state.data.lines.length+' 句、'+state.data.lines.reduce((n,l)=>n+l.words.length,0)+' 個音節');}
+  catch(e){toast('匯入 ASS 失敗：'+e.message);}finally{input.value='';}
 }
 async function exportStandalone(){
   try{
@@ -546,10 +633,10 @@ async function exportStandalone(){
     html.documentElement.lang='zh-Hant';
     html.head.innerHTML='<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>逐字節拍同步播放 · 離線版</title>';
     const style=html.createElement('style');style.id='sync-embedded-style';style.textContent=fetched[0]+'\n'+fetched[1];html.head.append(style);
-    // Use the original static controls; the embedded JSON replaces the fetch in bootstrap.
+    // Export the current timing as a single interoperable ASS file embedded in the HTML.
     const source=document.querySelector('main').cloneNode(true);
     html.body.append(document.querySelector('.site-header').cloneNode(true),source,document.querySelector('.site-footer').cloneNode(true));
-    const dataScript=html.createElement('script');dataScript.type='application/json';dataScript.id='embedded-demo';dataScript.textContent=JSON.stringify({...state.data,bpm:state.bpm,beatOffset:state.beatOffset,duration:state.duration}).replace(/<\//g,'<\\/');html.body.append(dataScript);
+    const dataScript=html.createElement('script');dataScript.type='text/plain';dataScript.id='embedded-ass';dataScript.textContent=exportAss({...state.data,bpm:state.bpm,beatOffset:state.beatOffset,duration:state.duration}).replace(/<\//g,'<\\/');html.body.append(dataScript);
     const config=html.createElement('script');config.id='embedded-configuration';config.type='application/json';config.textContent=JSON.stringify({preset:state.preset,settings:state.settings,fx:[...state.fx],position:state.position}).replace(/<\//g,'<\\/');html.body.append(config);
     const js=html.createElement('script');js.type='module';js.id='sync-embedded-script';js.textContent=fetched[2];html.body.append(js);
     downloadText('<!doctype html>\n'+html.documentElement.outerHTML,'lyrics-beat-sync-player.html','text/html;charset=utf-8');
@@ -566,8 +653,7 @@ function setupTransport(){
   $('#seek').addEventListener('change',e=>{state.isSeeking=false;seekTo(e.target.value);});
   $('#fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('#projection').requestFullscreen();}catch{$('#projection').classList.toggle('is-expanded');}});
   $('#exit-fullscreen').addEventListener('click',()=>{if(document.fullscreenElement)document.exitFullscreen();else $('#projection').classList.remove('is-expanded');});
-  $('#srt-file').addEventListener('change',e=>importFile(e.target,'srt'));
-  $('#json-file').addEventListener('change',e=>importFile(e.target,'json'));
+  $('#ass-file').addEventListener('change',e=>importAssFile(e.target));
   $('#audio-file').addEventListener('change',e=>{
     const file=e.target.files?.[0];if(!file)return;
     pause();if(state.mediaUrl)URL.revokeObjectURL(state.mediaUrl);
@@ -587,14 +673,13 @@ function setupTransport(){
       const source=structuredClone(state.originalDemo);
       source.lines.forEach(l=>{l.start*=factor;l.end*=factor;l.words.forEach(w=>{w.start*=factor;w.end*=factor;});});
       source.duration*=factor;source.bpm=bpm;
-      const current=position()*state.data.duration/source.duration;
+      const current=position()*factor;
       state.data=normalizeData(source,'manual-demo');state.duration=state.data.duration;state.displayedLine=-2;state.activeWord=-2;rebuildEvents();
       $('#seek').max=state.duration;buildTimeline();seekTo(current);
     }
     if(state.playing&&!state.media){state.position=position();reseedClock();}
   });
-  $('#download-srt').addEventListener('click',downloadSrt);
-  $('#download-json').addEventListener('click',downloadJson);
+  $('#download-ass').addEventListener('click',downloadAss);
   $('#download-audio').addEventListener('click',generateWav);
   $('#download-html')?.addEventListener('click',exportStandalone);
   document.addEventListener('keydown',e=>{
@@ -608,9 +693,9 @@ function setupTransport(){
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)pause();});
 }
 async function main(){
-  const embedded=$('#embedded-demo');
+  const embedded=$('#embedded-ass');
   let demo;
-  try{demo=embedded?JSON.parse(embedded.textContent):await fetch('./demo-timing.json').then(r=>{if(!r.ok)throw Error('範例資料載入失敗');return r.json();});}
+  try{demo=parseAss(embedded?embedded.textContent:await fetch('./demo.ass').then(r=>{if(!r.ok)throw Error('ASS 範例載入失敗');return r.text();}));}
   catch(e){const note=document.createElement('p');note.className='error-box';note.textContent=e.message;$('#projection-lyrics').replaceChildren(note);return;}
   renderSelectors();setupTransport();state.originalDemo=structuredClone(demo);useData(demo,'manual-demo');usePreset('obvious');
   const saved=$('#embedded-configuration');if(saved){try{const options=JSON.parse(saved.textContent);if(options.preset&&PRESETS[options.preset])usePreset(options.preset);else if(options.settings){state.settings={...state.settings,...options.settings};state.fx=new Set((options.fx||[]).filter(id=>ALL_FX.some(f=>f.id===id)));state.preset=null;setStyle();}seekTo(options.position||0);}catch(e){console.warn('載入匯出樣式失敗',e);}}
