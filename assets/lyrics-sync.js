@@ -108,8 +108,8 @@ function usePreset(id){
 }
 function renderSelectors(){
   $('#preset-select').innerHTML=Object.entries(PRESETS).map(([id,p])=>`<button type="button" data-preset="${id}">${p.name}</button>`).join('');
-  $('#fx-grid').innerHTML=GROUPS.map(g=>`<section class="fx-group" data-group="${g.id}"><div class="fx-group-header"><h3>${g.title}</h3><p>${g.desc}</p></div><div class="fx-group-grid"><button type="button" class="fx-card fx-none" data-group="${g.id}" aria-pressed="false"><span class="fx-preview demo-none"><span class="fx-demo-word">原樣</span></span><span class="fx-card-heading"><span>無效果</span><span class="fx-indicator">○ 保留原樣</span></span><span class="fx-desc">清空本類別，其他類別完全保留</span></button>${ALL_FX.filter(f=>f.group===g.id).map(f=>`<button type="button" class="fx-card" data-fx="${f.id}" aria-pressed="false"><span class="fx-preview sample-${f.id}"><span class="fx-demo-word">歌詞</span><i class="fx-sample-dot"></i></span><span class="fx-card-heading"><span>${f.title}</span><span class="fx-indicator">○ 未啟用</span></span><span class="fx-desc">${f.desc}</span></button>`).join('')}</div></section>`).join('');
-  $('#preset-grid').innerHTML=Object.entries(PRESETS).map(([id,p])=>`<button type="button" class="preset-card" data-preset="${id}" style="--preset-color:${p.accentColor};--preset-glow:${p.accentColor}55"><span class="preset-card-preview preset-${id}"><span class="preset-text">祢的光 照亮我</span></span><span class="preset-card-detail"><strong>${p.name}</strong><p>${p.desc}</p><small>${p.fx.length?p.fx.map(id=>ALL_FX.find(f=>f.id===id)?.title).join(' + '):'無動態'}</small></span></button>`).join('');
+  $('#fx-grid').innerHTML=GROUPS.map(g=>`<section class="fx-group" data-group="${g.id}"><div class="fx-group-header"><h3>${g.title}</h3><p>${g.desc}</p></div><div class="fx-group-grid"><button type="button" class="fx-card fx-none" data-group="${g.id}" aria-pressed="false">${previewMarkup('none',g.id)}<span class="fx-card-heading"><span>無效果</span><span class="fx-indicator">○ 保留原樣</span></span><span class="fx-desc">清空本類別，其他類別完全保留</span></button>${ALL_FX.filter(f=>f.group===g.id).map(f=>`<button type="button" class="fx-card" data-fx="${f.id}" aria-pressed="false">${previewMarkup('single',f.id)}<span class="fx-card-heading"><span>${f.title}</span><span class="fx-indicator">○ 未啟用</span></span><span class="fx-desc">${f.desc}</span></button>`).join('')}</div></section>`).join('');
+  $('#preset-grid').innerHTML=Object.entries(PRESETS).map(([id,p])=>`<button type="button" class="preset-card" data-preset="${id}" style="--preset-color:${p.accentColor};--preset-glow:${p.accentColor}55">${previewMarkup('preset',id)}<span class="preset-card-detail"><strong>${p.name}</strong><p>${p.desc}</p><small>${p.fx.length?p.fx.map(id=>ALL_FX.find(f=>f.id===id)?.title).join(' + '):'無動態'}</small></span></button>`).join('');
   $('#preset-select').addEventListener('click',e=>{const b=e.target.closest('[data-preset]');if(b)usePreset(b.dataset.preset);});
   $('#preset-grid').addEventListener('click',e=>{const b=e.target.closest('[data-preset]');if(b){usePreset(b.dataset.preset);$('#projection').scrollIntoView({behavior:'smooth',block:'center'});}});
   $('#fx-grid').addEventListener('click',e=>{
@@ -199,7 +199,7 @@ function buildStage(index){
     const ch=part.text;
     if(part.wi<0){const s=document.createElement('span');s.className='glyph space';s.textContent=ch;stage.append(s);continue;}
     const span=document.createElement('span');span.className='glyph';
-    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id));
+    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id)) || (state.fx.has('ball-ink')?{id:'fill-down'}:null);
     span.dataset.drawn=reveal?reveal.id:'none';
     const outline=document.createElement('span');outline.className='glyph-outline';outline.textContent=ch;
     const solid=document.createElement('span');solid.className='glyph-solid';solid.textContent=ch;
@@ -365,7 +365,7 @@ function renderAt(t){
     const line=state.data.lines[lineIndex];
     line.words.forEach((w,i)=>{if(time>=w.start&&time<w.end)activeWord=i;});
     const o=state.settings;
-    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id))?.id||'none';
+    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id))?.id||(state.fx.has('ball-ink')?'fill-down':'none');
     glyphs.forEach((el,i)=>{
       const w=line.words[i];if(!w)return;
       const onset=time-w.start,duration=w.end-w.start,p=clamp(onset/duration,0,1);
@@ -805,6 +805,165 @@ function setupTransport(){
   });
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)pause();});
 }
+
+// All 44 gallery cards use one shared musical clock. They are real word-time
+// renderers (four glyphs each), not independent keyframe illustrations.
+const MINI_BPM=120, MINI_BEAT=60/MINI_BPM, MINI_DURATION=4*MINI_BEAT;
+const MINI_WORDS=Array.from('一二三四');
+let miniItems=[],miniRun=true,miniAnchor=0,miniFrozen=0,miniFrame=0;
+let miniSoundOn=false,miniAudio=null,miniAudioOffset=0,miniNextBeat=0,miniScheduler=0;
+let miniObserver=null;
+const MINI_OFFSETS=[[-1.1,-1.3,-36],[1.25,-.9,48],[-1.35,1.2,27],[1.05,1.35,-32]];
+function previewMarkup(kind,id){
+  const letters=MINI_WORDS.map((ch,i)=>`<span class="glyph mini-glyph" data-index="${i}" data-drawn="none"><span class="glyph-outline">${ch}</span><span class="glyph-solid">${ch}</span><span class="underline" aria-hidden="true"></span><span class="glyph-halo" aria-hidden="true"></span>${MINI_OFFSETS.map(([x,y,r],j)=>`<span class="glyph-fragment part-${j}" style="--dx:${x}em;--dy:${y}em;--rot:${r}deg" aria-hidden="true">${ch}</span>`).join('')}</span>`).join('');
+  const cssClass=kind==='preset'?'preset-card-preview':'fx-preview';
+  return `<span class="karaoke-preview ${cssClass}" data-mini-kind="${kind}" data-mini-id="${id}" aria-label="一二三四，四拍同步動態預覽"><span class="mini-lyrics">${letters}<i class="mini-ball" hidden></i><i class="mini-impact" hidden></i></span><span class="mini-beats" aria-hidden="true"><b>1</b><b>2</b><b>3</b><b>4</b></span></span>`;
+}
+function miniSettings(item){
+  if(item.kind==='preset')return PRESETS[item.id];
+  return {...PRESETS.obvious,accentColor:'#90f7df',baseColor:'#d2dce9',shadow:23,scale:48,underline:3,
+    ballSize:18,bounce:28,moveX:11,moveY:-9};
+}
+function previewPaintWord(el,i,t,fx,o,phase){
+  const onset=t-i*MINI_BEAT, duration=MINI_BEAT;
+  const p=clamp(onset/duration,0,1), singing=onset>=0&&onset<duration;
+  const impulse=singing?Math.exp(-onset*7):0;
+  const entrance=clamp(onset/.28,0,1),ease=1-Math.pow(1-entrance,3);
+  const fadeOut=clamp((t-(i+1)*MINI_BEAT)/.2,0,1);
+  const scale=1+(fx.has('scale')?o.scale/100*impulse:0)+(singing&&fx.has('pulse')?.13*(1-phase)*(1-phase):0);
+  const squash=fx.has('squash')?Math.sin(Math.min(1,Math.max(0,onset)/.38)*Math.PI*2)*impulse*.26:0;
+  let x=0,y=0;
+  if(fx.has('lift'))y-=17*impulse;
+  if(fx.has('drop'))y+=onset<0?-36:(1-ease)*-36;
+  if(fx.has('slide-left'))x+=onset<0?-27:-(1-ease)*27;
+  if(fx.has('slide-right'))x+=onset<0?27:(1-ease)*27;
+  const tilt=fx.has('tilt')?Math.sin(Math.min(1,Math.max(0,onset)/.45)*Math.PI*2)*impulse*19:0;
+  el.style.setProperty('--scale',scale.toFixed(4));
+  el.style.setProperty('--scale-x',(1+squash).toFixed(4));
+  el.style.setProperty('--motion-x',x.toFixed(2)+'px');el.style.setProperty('--motion-y',y.toFixed(2)+'px');
+  el.style.setProperty('--tilt',tilt.toFixed(1)+'deg');
+  el.style.setProperty('--alpha',fx.has('fade')?(onset<0?0:Math.min(1,onset/.18)*(1-.62*fadeOut)):1);
+  const reveal=ALL_FX.find(f=>f.group==='reveal'&&fx.has(f.id))?.id||(fx.has('ball-ink')?'fill-down':'none');
+  const fill=reveal==='glyph-fall'?ease:reveal==='assemble'?clamp(onset/.43,0,1):p;
+  el.dataset.drawn=reveal;
+  el.style.setProperty('--reveal',(fx.has('ball-ink')&&onset>=0?clamp(onset/.35,0,1)*100:fill*100).toFixed(2)+'%');
+  el.style.setProperty('--piece-p',clamp(onset/.42,0,1).toFixed(4));
+  el.style.setProperty('--piece-opacity',reveal==='assemble'?clamp(onset/.24,0,1).toFixed(4):'0');
+  el.style.setProperty('--fall',(Math.pow(1-ease,2)*-1.8).toFixed(3)+'em');
+  el.style.setProperty('--under-progress',fx.has('underline')?p.toFixed(3):'0');
+  el.style.setProperty('--under-opacity',fx.has('underline')&&onset>=0?'1':'0');
+  const color=fx.size===0?o.baseColor:(singing||(onset>=0&&(reveal!=='none'||fx.has('color')))?o.accentColor:o.baseColor);
+  el.style.setProperty('--active',color);
+  const glow=fx.has('glow')?(singing?o.shadow*1.65:o.shadow*.35):0;
+  const shadow=fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
+  const blur=Math.max(glow,shadow);
+  const trail=fx.has('trail')&&singing?',-2px 0 #52d6ff,2px 0 #ec7bff':'';
+  el.style.setProperty('--letter-shadow',blur?`0 0 ${blur.toFixed(1)}px ${o.accentColor}${trail}`:(trail?'-2px 0 #52d6ff,2px 0 #ec7bff':'none'));
+  el.style.setProperty('--halo-scale',fx.has('halo')&&onset>=0?(1+Math.min(1,onset/.45)*1.2).toFixed(3):'0');
+  el.style.setProperty('--halo-alpha',fx.has('halo')&&singing?Math.max(0,1-onset/.5).toFixed(3):'0');
+  el.style.setProperty('--shimmer',fx.has('shimmer')?(Math.max(0,Math.min(1,onset/.48))*170-35)+'%':'-50%');
+  const spark=fx.has('spark')&&onset>=0&&onset<.3?Math.max(0,1-onset/.3):0;
+  el.style.setProperty('--spark-alpha',spark.toFixed(3));
+  el.style.setProperty('--spark-radius',((1-spark)*.7).toFixed(3)+'em');
+}
+function previewDrawBall(item,t,fx,o){
+  const ball=item.ball,impact=item.impact;
+  const mode=['ball','ball-impact','ball-ink'].find(id=>fx.has(id));
+  if(!mode){ball.hidden=true;impact.hidden=true;return;}
+  const row=item.row,chars=item.glyphs;
+  const active=Math.floor(t/MINI_BEAT)%4,local=(t%MINI_BEAT)/MINI_BEAT;
+  const from=chars[active],to=chars[(active+1)%4];
+  const x0=from.offsetLeft+from.offsetWidth/2,x1=to.offsetLeft+to.offsetWidth/2;
+  const baseline=from.offsetTop-3;
+  const diameter=clamp(from.offsetWidth*(o.ballSize||20)/100,5,10);
+  ball.style.width=diameter+'px';ball.style.height=diameter+'px';
+  if(mode==='ball'){
+    // The last hop travels from 四 to 一 over the same continuous shared loop.
+    const smooth=.5-.5*Math.cos(Math.PI*local);
+    const x=x0+(x1-x0)*smooth;
+    const height=clamp(o.bounce*.7,12,36);
+    const y=baseline-height*4*local*(1-local)-diameter/2;
+    const contact=Math.max(0,1-(local*MINI_BEAT)/.105);
+    ball.hidden=false;impact.hidden=true;
+    ball.style.left=x.toFixed(2)+'px';ball.style.top=y.toFixed(2)+'px';
+    ball.style.transform=`translate(-50%,-50%) scale(${(1+.30*contact).toFixed(3)},${(1-.26*contact).toFixed(3)})`;
+    ball.style.opacity='1';
+  }else{
+    const dt=t-active*MINI_BEAT;
+    const incoming=dt<.14;
+    ball.hidden=!incoming;impact.hidden=dt>.32;
+    ball.style.left=x0+'px';ball.style.top=(baseline-diameter/2-28*Math.pow(1-clamp(dt/.14,0,1),2))+'px';
+    ball.style.transform=`translate(-50%,-50%) scale(${(1+.15*clamp(dt/.14,0,1)).toFixed(2)},${(1-.12*clamp(dt/.14,0,1)).toFixed(2)})`;
+    impact.style.left=x0+'px';impact.style.top=(baseline-diameter/2)+'px';
+    impact.style.opacity=(1-clamp(dt/.32,0,1)).toFixed(3);
+    impact.style.setProperty('--mini-burst',`${(8+dt*80).toFixed(2)}px`);
+  }
+}
+function paintMiniFrame(t){
+  const beat=Math.floor(t/MINI_BEAT)%4;
+  const phase=(t%MINI_BEAT)/MINI_BEAT;
+  for(const item of miniItems){
+    if(!item.visible)continue;
+    const fx=item.fx,o=item.settings;
+    item.glyphs.forEach((g,i)=>previewPaintWord(g,i,t,fx,o,phase));
+    item.markers.forEach((b,i)=>b.classList.toggle('on',beat===i));
+    previewDrawBall(item,t,fx,o);
+  }
+  const currentBeatLabel=$('#mini-count');if(currentBeatLabel && currentBeatLabel.dataset.beat!==String(beat)){currentBeatLabel.dataset.beat=String(beat);currentBeatLabel.textContent=`${beat+1} / 4`;}
+}
+function miniTime(now){return ((miniRun?(now-miniAnchor)/1000:miniFrozen)%MINI_DURATION+MINI_DURATION)%MINI_DURATION;}
+function miniTick(now){paintMiniFrame(miniTime(now));miniFrame=requestAnimationFrame(miniTick);}
+function miniStopSound(){miniSoundOn=false;clearInterval(miniScheduler);miniScheduler=0;$('#mini-sound').textContent='開啟節拍聲';$('#mini-sound').setAttribute('aria-pressed','false');}
+function miniAudioTick(){
+  if(!miniSoundOn||!miniAudio||!miniRun)return;
+  const now=miniAudio.currentTime;
+  // AudioContext clock owns the beat schedule, not requestAnimationFrame.
+  while(miniAudioOffset+miniNextBeat*MINI_BEAT<now+.12){
+    const at=miniAudioOffset+miniNextBeat*MINI_BEAT,which=miniNextBeat%4;
+    if(at>=now-.025){
+      const oscillator=miniAudio.createOscillator(),vol=miniAudio.createGain();
+      oscillator.type=which===0?'triangle':'sine';
+      oscillator.frequency.value=[660,880,990,784][which];
+      vol.gain.setValueAtTime(.0001,at);vol.gain.exponentialRampToValueAtTime(which===0?.075:.045,at+.003);vol.gain.exponentialRampToValueAtTime(.0001,at+.11);
+      oscillator.connect(vol);vol.connect(miniAudio.destination);oscillator.start(at);oscillator.stop(at+.12);
+      oscillator.onended=()=>{oscillator.disconnect();vol.disconnect();};
+    }
+    miniNextBeat++;
+  }
+}
+function miniSeedAudio(){if(miniSoundOn&&miniAudio){miniAudioOffset=miniAudio.currentTime-miniTime(performance.now());miniNextBeat=Math.ceil((miniAudio.currentTime-miniAudioOffset)/MINI_BEAT-.0001);}}
+function initSyncedPreviews(){
+  miniItems=$$('.karaoke-preview').map(root=>{
+    const kind=root.dataset.miniKind,id=root.dataset.miniId;
+    const fx=new Set(kind==='preset'?PRESETS[id].fx:kind==='single'?[id]:[]);
+    const settings=miniSettings({kind,id});
+    root.style.setProperty('--highlight',settings.accentColor);root.style.setProperty('--inactive',settings.baseColor);
+    root.style.setProperty('--stroke-size',(settings.stroke||1.5)+'px');root.style.setProperty('--underline-size',(settings.underline||3)+'px');
+    root.style.setProperty('--shift-x',fx.has('shift')?settings.moveX+'px':'0px');
+    root.style.setProperty('--shift-y',fx.has('shift')?settings.moveY+'px':'0px');
+    root.style.setProperty('--stage-bg',settings.bgColor);
+    return {root,kind,id,fx,settings,row:root.querySelector('.mini-lyrics'),glyphs:[...root.querySelectorAll('.mini-glyph')],ball:root.querySelector('.mini-ball'),impact:root.querySelector('.mini-impact'),markers:[...root.querySelectorAll('.mini-beats b')],visible:true};
+  });
+  miniObserver=new IntersectionObserver(entries=>{for(const entry of entries){const item=miniItems.find(x=>x.root===entry.target);if(item)item.visible=entry.isIntersecting;}},{rootMargin:'180px'});
+  miniItems.forEach(item=>miniObserver.observe(item.root));
+  miniAnchor=performance.now();miniTick(miniAnchor);
+  $('#mini-play').addEventListener('click',()=>{
+    if(miniRun){miniFrozen=miniTime(performance.now());miniRun=false;miniStopSound();}
+    else{miniRun=true;miniAnchor=performance.now()-miniFrozen*1000;miniSeedAudio();}
+    $('#mini-play').textContent=miniRun?'暫停預覽':'播放預覽';
+  });
+  $('#mini-reset').addEventListener('click',()=>{miniFrozen=0;miniAnchor=performance.now();miniSeedAudio();paintMiniFrame(0);});
+  $('#mini-sound').addEventListener('click',async()=>{
+    if(miniSoundOn){miniStopSound();return;}
+    try{miniAudio??=new (window.AudioContext||window.webkitAudioContext)();await miniAudio.resume();
+      if(!miniRun){miniRun=true;miniAnchor=performance.now()-miniFrozen*1000;$('#mini-play').textContent='暫停預覽';}
+      miniSoundOn=true;miniSeedAudio();miniScheduler=setInterval(miniAudioTick,35);miniAudioTick();
+      $('#mini-sound').textContent='關閉節拍聲';$('#mini-sound').setAttribute('aria-pressed','true');
+    }catch(e){toast('無法啟動節拍聲：'+e.message);}
+  });
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&miniSoundOn)miniStopSound();});
+}
+
 async function main(){
   const embeddedVtt=$('#embedded-vtt'),embeddedAss=$('#embedded-ass');
   let demo;
@@ -812,6 +971,7 @@ async function main(){
   catch(e){const note=document.createElement('p');note.className='error-box';note.textContent=e.message;$('#projection-lyrics').replaceChildren(note);return;}
   renderSelectors();setupTransport();state.originalDemo=(embeddedVtt||embeddedAss)?null:structuredClone(demo);useData(demo,(embeddedVtt||embeddedAss)?(demo.alignment||'precise'):'manual-demo');usePreset('obvious');
   const saved=$('#embedded-configuration');if(saved){try{const options=JSON.parse(saved.textContent);if(options.preset&&PRESETS[options.preset])usePreset(options.preset);else if(options.settings){state.settings={...state.settings,...options.settings};state.fx=new Set((options.fx||[]).filter(id=>ALL_FX.some(f=>f.id===id)));state.preset=null;setStyle();}seekTo(options.position||0);}catch(e){console.warn('載入匯出樣式失敗',e);}}
+  initSyncedPreviews();
   initialized=true;
 }
 main();
