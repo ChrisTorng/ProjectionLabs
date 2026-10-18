@@ -3,37 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="依 SRT 與逐字時間碼，跟著真正的節拍展示歌詞字色、縮放、底線、跳動小圓球、空心字填色及多層效果組合。">
+  <meta name="description" content="依 SRT 與逐字時間碼，由快音群、休止、四拍長音與逐字精確時間碼控制 28 個獨立效果，可分類疊加及套用 11 組風格。">
   <title>逐字節拍同步效果實驗室 · ProjectionLabs</title>
-  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  
+  
+  
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="../assets/theme.css">
-  <link rel="stylesheet" href="../assets/lyrics-sync.css?v=1">
-</head>
+  <link rel="stylesheet" href="../assets/lyrics-sync.css?v=2"></head>
 <body>
 <header class="site-header"><div class="container header-inner">
   <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">P</span>ProjectionLabs</a>
   <nav class="site-nav" aria-label="實驗室導覽"><a href="../">全部實驗室</a><a href="../lyrics/">歌詞文字效果</a><a href="./" aria-current="page">逐字節拍同步</a><a href="../music-motion/">音樂動態</a></nav>
 </div></header>
 <main class="container">
-  <div class="page-title"><p class="overline">LYRICS / BEAT-SYNCED TYPOGRAPHY</p><h1>逐字節拍同步效果實驗室</h1><p>字元依照演唱時間逐一反應，長音持續、節拍重擊不會中斷。單層效果獨立啟用，多層風格一鍵組合。</p></div>
+  <div class="page-title"><p class="overline">LYRICS / BEAT-SYNCED TYPOGRAPHY</p><h1>逐字節拍同步效果實驗室</h1><p>連續八句、每句不同旋律和節奏：十六分音群、句中休止、二拍與四拍長音。28 種單項效果可獨立疊加，各類提供「無效果」，11 組預設可直接比較。</p></div>
   <div class="sync-layout">
     <section class="work-area" aria-label="逐字歌詞投影預覽">
-      <div class="section-top"><div><span class="eyebrow">LIVE OUTPUT · 16:9</span><h2>即時投影預覽 <span class="status" id="alignment-status">手工逐字對位</span></h2></div><span class="mono" id="clock-readout">00:00.000 / 00:45.000</span></div>
+      <div class="section-top"><div><span class="eyebrow">LIVE OUTPUT · 16:9</span><h2>即時投影預覽 <span class="status" id="alignment-status">手工逐字對位</span></h2></div><span class="mono" id="clock-readout">00:00.000 / 00:36.923</span></div>
       <div class="projection" id="projection" role="region" aria-label="逐字歌詞畫面">
         <div class="projection-ambient"></div>
-        <div class="projection-content" id="projection-content"><div class="projection-lyrics" id="projection-lyrics"></div><div id="ball" class="sing-ball" hidden></div></div>
-        <div class="stage-label"><span id="stage-state">DEMO TRACK</span><span id="stage-counter">96 BPM · 4/4</span></div>
+        <div class="projection-content" id="projection-content"><div class="projection-lyrics" id="projection-lyrics"></div><div id="ball" class="sing-ball" hidden></div><div id="impact" class="ball-impact" hidden aria-hidden="true"><i style="--a:0deg"></i><i style="--a:45deg"></i><i style="--a:90deg"></i><i style="--a:135deg"></i><i style="--a:180deg"></i><i style="--a:225deg"></i><i style="--a:270deg"></i><i style="--a:315deg"></i></div></div>
+        <div class="stage-label"><span id="stage-state">DEMO TRACK</span><span id="stage-counter">104 BPM · 4/4</span></div>
         <button type="button" id="exit-fullscreen" class="exit-fullscreen">離開全螢幕</button>
       </div>
       <div class="transport">
         <button id="play" class="primary play-button" type="button">▶ 播放示範</button>
         <button id="restart" type="button">↺ 重頭</button>
         <button id="loop-toggle" type="button" aria-pressed="true">循環：開</button>
-        <button id="click-toggle" type="button" aria-pressed="true">節拍音：開</button>
+        <button id="click-toggle" type="button" aria-pressed="true">示範伴奏：開</button>
         <button id="fullscreen" type="button">⛶ 全螢幕</button>
       </div>
-      <div class="seek-row"><label for="seek">演出進度</label><input id="seek" type="range" min="0" max="45" step="0.001" value="0"><output id="seek-time" class="mono">00:00.000</output></div>
-      <div class="beat-strip"><div class="beat-points" id="beat-points" aria-label="四拍節奏"><span>1</span><span>2</span><span>3</span><span>4</span></div><div class="beat-meta"><strong id="bar-num">第 1 小節</strong><span id="beat-num">第 1 拍</span></div><div class="now-singing">正在唱：<strong id="now-word">前奏</strong></div></div>
+      <div class="seek-row"><label for="seek">演出進度</label><input id="seek" type="range" min="0" max="36.923" step="0.001" value="0"><output id="seek-time" class="mono">00:00.000</output></div>
+      <div class="beat-strip"><div class="beat-points" id="beat-points" aria-label="四拍節奏"><span>1</span><span>2</span><span>3</span><span>4</span></div><div class="beat-meta"><strong id="bar-num">第 1 小節</strong><span id="beat-num">第 1 拍</span><span id="phrase-rhythm" class="rhythm-tag">快速起句 → 四拍長音</span></div><div class="now-singing">正在唱：<strong id="now-word">準備播放</strong></div></div>
       <section class="timing-panel" aria-label="逐字演唱時間軸"><div class="section-top tight"><div><span class="eyebrow">TIMING / WORD ALIGNMENT</span><h2>逐字時間軸</h2></div><span class="hint-text">按字可跳到該字開始</span></div><div id="timeline" class="timeline"></div></section>
     </section>
     <aside class="control-area" aria-label="樣式及資料控制">
@@ -42,6 +44,8 @@
         <label class="ctrl"><span>字體大小 <output id="fontSize-val"></output></span><input id="fontSize" type="range" min="4" max="13" step="0.2"></label>
         <label class="ctrl"><span>唱到放大幅度 <output id="scale-val"></output></span><input id="scale" type="range" min="0" max="75" step="1"></label>
         <div class="color-controls"><label>一般文字 <input id="baseColor" type="color"></label><label>唱到顏色 <input id="accentColor" type="color"></label><label>舞台底色 <input id="bgColor" type="color"></label></div>
+        <label class="ctrl"><span>水平移動 <output id="moveX-val"></output></span><input id="moveX" type="range" min="-100" max="100" step="1"></label>
+        <label class="ctrl"><span>垂直移動 <output id="moveY-val"></output></span><input id="moveY" type="range" min="-70" max="70" step="1"></label>
         <label class="ctrl"><span>陰影擴散 <output id="shadow-val"></output></span><input id="shadow" type="range" min="0" max="50" step="1"></label>
         <label class="ctrl"><span>描邊粗細 <output id="stroke-val"></output></span><input id="stroke" type="range" min="0.4" max="3.5" step="0.1"></label>
         <label class="ctrl"><span>底線厚度 <output id="underline-val"></output></span><input id="underline" type="range" min="1" max="9" step="1"></label>
@@ -49,20 +53,21 @@
         <label class="ctrl"><span>圓球跳動高度 <output id="bounce-val"></output></span><input id="bounce" type="range" min="8" max="72" step="1"></label>
       </section>
       <section class="control-panel"><div class="panel-heading"><h2>資料與對位</h2><span class="hint-text">全部只在本機處理</span></div>
-        <div class="stats-row"><span><strong>96</strong><small>BPM</small></span><span><strong>4/4</strong><small>拍號</small></span><span><strong id="word-count">59</strong><small>歌詞字數</small></span></div>
+        <div class="stats-row"><span><strong>104</strong><small>BPM</small></span><span><strong>4/4</strong><small>拍號</small></span><span><strong id="word-count">72</strong><small>歌詞字數</small></span></div>
         <div class="import-grid"><label class="file-picker">載入 SRT<input type="file" id="srt-file" accept=".srt,text/plain"></label><label class="file-picker">載入逐字 JSON<input type="file" id="json-file" accept=".json,application/json"></label><label class="file-picker full">載入自己的音樂檔<input type="file" id="audio-file" accept="audio/*"></label></div>
-        <label class="ctrl"><span>節拍速度 <output id="bpm-val">96 BPM</output></span><input id="bpm" type="range" min="60" max="160" step="1"></label>
-        <div class="download-grid"><button type="button" id="download-srt">下載 SRT</button><button type="button" id="download-json">下載逐字時間碼</button><button type="button" id="download-audio">下載節拍 WAV</button><button type="button" id="download-html">下載獨立 HTML</button></div>
+        <label class="ctrl"><span>節拍速度 <output id="bpm-val">104 BPM</output></span><input id="bpm" type="range" min="70" max="180" step="1"></label>
+        <div class="download-grid"><button type="button" id="download-srt">下載 SRT</button><button type="button" id="download-json">下載逐字時間碼</button><button type="button" id="download-audio">下載旋律＋節奏 WAV</button><button type="button" id="download-html">下載獨立 HTML</button></div>
         <div class="hint-box" id="data-note">SRT 只有每句起迄；精確逐字時間與長音請使用 JSON。匯入一般 SRT 時，系統會先以均分方式產生<b>估算</b>的逐字時間，並明確標示。</div>
       </section>
     </aside>
   </div>
-  <section class="browse-section" aria-label="獨立文字效果"><div class="section-top"><div><span class="eyebrow">EFFECT LAYERS / MULTI-SELECT</span><h2>單項效果測試</h2></div><p>每一張卡片都是獨立圖層，可同時啟用多種效果。</p></div><div class="fx-grid" id="fx-grid"></div></section>
-  <section class="browse-section" aria-label="預設成組效果"><div class="section-top"><div><span class="eyebrow">PRESET COMBINATIONS / ONE CLICK</span><h2>預設組合預覽</h2></div><p>完整套用字色、陰影、底線、逐字動畫與節拍球設定。</p></div><div class="preset-grid" id="preset-grid"></div></section>
-  <div class="footnote">示範節拍採 96 BPM、4/4 拍，每句 2 小節；字幕 00:02.500 起。長音字跨越多拍時，圓球會留在原字上方依拍重複跳動。播放與視覺使用同一時間軸。</div>
+  <section class="browse-section" aria-label="獨立文字效果"><div class="section-top"><div><span class="eyebrow">EFFECT LAYERS / MULTI-SELECT</span><h2>單項效果測試</h2></div><p>28 種可逐項啟用；每類都有「無效果」。字面遮罩與球型效果單選，其他分類自由疊加。</p></div><div class="fx-grid" id="fx-grid"></div></section>
+  <section class="browse-section" aria-label="預設成組效果"><div class="section-top"><div><span class="eyebrow">PRESET COMBINATIONS / ONE CLICK</span><h2>預設組合預覽</h2></div><p>11 組有意義的效果鏈；點選後主預覽立即切換。</p></div><div class="preset-grid" id="preset-grid"></div></section>
+  <div class="footnote">示範音訊是無人聲的合成音符與變化鼓點，文字精確對應其起音與時值。104 BPM，八句各兩小節，從 00:00 起立即有字，最後一字結束即停止；句中休止仍保留文字。圓球飛行路徑使用逐格拋物線位置，而非水平底部滑動。</div>
 </main>
 <footer class="site-footer"><div class="container footer-inner"><span>ProjectionLabs · 歌詞節拍同步原型</span><a href="https://github.com/ChrisTorng/ProjectionLabs">GitHub 原始碼</a></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script type="module" src="../assets/lyrics-sync.js?v=1"></script>
+
+<script type="module" src="../assets/lyrics-sync.js?v=2"></script>
 </body>
 </html>
