@@ -41,7 +41,7 @@
 .word-chip.long-note{border-bottom:2px solid #e0ab77}
 .fx-preview{height:78px;position:relative}
 .fx-preview .fx-demo-word{font-size:29px;letter-spacing:2px;display:block}
-.fx-preview .fx-sample-dot{display:none;position:absolute;width:12px;height:12px;border-radius:50%;background:#9efbe7;box-shadow:0 0 13px #87e5ce;left:50%;top:6px}
+.fx-preview .fx-sample-dot{display:none;position:absolute;width:8px;height:8px;border-radius:50%;background:#9efbe7;box-shadow:0 0 13px #87e5ce;left:50%;top:6px}
 .fx-preview.sample-scale .fx-demo-word{animation:lab-scale 2s ease-in-out infinite}
 .fx-preview.sample-color .fx-demo-word{animation:lab-color 2s ease-in-out infinite}
 .fx-preview.sample-shadow .fx-demo-word,.fx-preview.sample-glow .fx-demo-word{animation:lab-glow 2s ease-in-out infinite}
@@ -88,7 +88,7 @@
 @keyframes lab-fill-circle{0%,100%{clip-path:circle(0%)}50%,82%{clip-path:circle(80%)}}
 @keyframes lab-fill-center{0%,100%{clip-path:inset(0 50%)}50%,82%{clip-path:inset(0)}}
 @keyframes lab-under{0%,100%{transform:scaleX(0)}50%,80%{transform:scaleX(1)}}
-@keyframes lab-ball{0%,100%{transform:translate(-25px,37px)}50%{transform:translate(10px,-8px)}}
+@keyframes lab-ball{0%,100%{transform:translate(-26px,17px) scale(1.2,.8)}12%{transform:translate(-16px,-7px) scale(1)}25%{transform:translate(-5px,17px) scale(1.2,.8)}35%{transform:translate(4px,-19px) scale(1)}50%{transform:translate(22px,17px) scale(1.2,.8)}62%{transform:translate(10px,-5px) scale(1)}75%{transform:translate(-4px,17px) scale(1.2,.8)}88%{transform:translate(-15px,-11px) scale(1)}}
 @keyframes lab-assemble{0%,100%{transform:scale(1.35) rotate(9deg);opacity:.35;filter:blur(5px)}52%,80%{transform:scale(1);opacity:1;filter:blur(0)}}
 .preset-card-detail small{display:block;color:#7996a8;font-size:.7rem;line-height:1.5;margin-top:5px}
 .preset-card[data-preset=retro] .preset-text{color:#ffc974;text-shadow:0 3px 10px #000}
