@@ -316,9 +316,11 @@ function renderAt(t){
       el.style.setProperty('--active',color);
       const glow=state.fx.has('glow')?(singing?o.shadow*1.8:o.shadow*.35):0;
       const shadow=state.fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
-      const blur=Math.max(shadow,glow);
-      const trail=state.fx.has('trail')&&singing?',-2px 0 #5fd9ff,2px 0 #e073f8':'';
-      el.style.setProperty('--letter-shadow',blur?`0 0 ${blur.toFixed(1)}px ${o.accentColor}${trail}`:(trail?'-2px 0 #5fd9ff,2px 0 #e073f8':'none'));
+      const shadows=[];
+      if(shadow>0)shadows.push(`1px 2px ${shadow.toFixed(1)}px #050b16`);
+      if(glow>0)shadows.push(`0 0 ${glow.toFixed(1)}px ${o.accentColor}`,`0 0 ${(glow*1.8).toFixed(1)}px ${o.accentColor}66`);
+      if(state.fx.has('trail')&&singing)shadows.push('-2px 0 #5fd9ff','2px 0 #e073f8');
+      el.style.setProperty('--letter-shadow',shadows.join(',')||'none');
       el.style.setProperty('--halo-scale',state.fx.has('halo')&&onset>=0?(1+Math.min(1,onset/.45)*1.15).toFixed(3):'0');
       el.style.setProperty('--halo-alpha',state.fx.has('halo')&&singing?Math.max(0,1-onset/.5).toFixed(3):'0');
       el.style.setProperty('--shimmer',state.fx.has('shimmer')?Math.max(0,Math.min(1,onset/.5))*170-35+'%':'-50%');
