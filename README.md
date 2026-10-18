@@ -130,7 +130,7 @@ ProjectionLabs/
 
 本頁已改為只匯入、匯出 .ass 歌詞；[demo.ass](lyrics-beat-sync/demo.ass) 是完整可在 Aegisub 等 ASS 字幕編輯器使用的範例。
 
-\`\`\`ass
+```ass
 [Script Info]
 Title: 逐字節拍歌詞
 ScriptType: v4.00+
@@ -139,13 +139,13 @@ ScriptType: v4.00+
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.00,0:00:02.88,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf50}光{\kf188}芒
-\`\`\`
+Dialogue: 0,0:00:00.00,0:00:03.38,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf50}光{\kf188}芒
+```
 
-- \`{\kf25}\` 表示該音節 0.25 秒的左至右卡拉 OK 填色時間；\`{\k50}\` 不附文字代表休止 0.5 秒；\`{\kf188}\` 是延長 1.88 秒。
+- `{\kf25}` 表示該音節 0.25 秒的左至右卡拉 OK 填色時間；`{\k50}` 不附文字代表休止 0.5 秒；`{\kf188}` 是延長 1.88 秒。
 - 時間精度為 0.01 秒。ASS 能精確交換音節的開始和持續時間，但不是完整記譜格式，無法標準化交換 MIDI 音高、節拍器 BPM 與拍號。
-- \`; BPM:\`、\`; BeatsPerBar:\`、\`; BeatOffset:\` 是本工具用的**選填註解**，不是 ASS 卡拉 OK 標準欄位；其他 ASS 軟體可安全忽略。
-- ASS 的傳統 \`\\k\`、\`\\K\`、\`\\kf\`、\`\\ko\` 均可讀取；頁面將每個標記的文字當成可動畫化的音節，支援單個中文字和多字母音節。其餘 ASS 排版特效不由本實驗室直接複製。
+- `; BPM:`、`; BeatsPerBar:`、`; BeatOffset:` 是本工具用的**選填註解**，不是 ASS 卡拉 OK 標準欄位；其他 ASS 軟體可安全忽略。
+- ASS 的傳統 `\k`、`\K`、`\kf`、`\ko` 均可讀取；頁面將每個標記的文字當成可動畫化的音節，支援單個中文字和多字母音節。其餘 ASS 排版特效不由本實驗室直接複製。
 - 載入自己的 ASS 後，BPM 滑桿只影響拍點，不擅自拉伸原有逐字時間；內建示範修改 BPM 才會按音樂比例縮放。
 - 下載的獨立 HTML 內嵌 ASS 內容，無需在瀏覽器旁放第二份 JSON。
 
