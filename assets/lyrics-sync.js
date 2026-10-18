@@ -182,7 +182,7 @@ function buildStage(index){
   for(const ch of Array.from(line.text)){
     if(/^\s$/u.test(ch)){const s=document.createElement('span');s.className='glyph space';s.textContent=' ';stage.append(s);continue;}
     const word=line.words[wi++];if(!word)break;
-    const span=document.createElement('span');span.className='glyph';
+    const span=document.createElement('span');span.className='glyph';span.dataset.char=ch;
     const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id));
     span.dataset.drawn=reveal?reveal.id:'none';
     const outline=document.createElement('span');outline.className='glyph-outline';outline.textContent=ch;
@@ -285,7 +285,7 @@ function renderAt(t){
     const line=state.data.lines[lineIndex];
     line.words.forEach((w,i)=>{if(time>=w.start&&time<w.end)activeWord=i;});
     const o=state.settings;
-    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id))?.id||'none';
+    const reveal=ALL_FX.find(f=>f.group==='reveal'&&state.fx.has(f.id))?.id||(state.fx.has('ball-ink')?'fill-down':'none');
     glyphs.forEach((el,i)=>{
       const w=line.words[i];if(!w)return;
       const onset=time-w.start,duration=w.end-w.start,p=clamp(onset/duration,0,1);
@@ -322,7 +322,7 @@ function renderAt(t){
       el.style.setProperty('--halo-scale',state.fx.has('halo')&&onset>=0?(1+Math.min(1,onset/.45)*1.15).toFixed(3):'0');
       el.style.setProperty('--halo-alpha',state.fx.has('halo')&&singing?Math.max(0,1-onset/.5).toFixed(3):'0');
       el.style.setProperty('--shimmer',state.fx.has('shimmer')?Math.max(0,Math.min(1,onset/.5))*170-35+'%':'-50%');
-      el.dataset.drawn=reveal;
+      el.dataset.drawn=reveal;el.dataset.shimmer=state.fx.has('shimmer')?'true':'false';
       const burst=(state.fx.has('spark')&&onset>=0&&onset<.3)?Math.max(0,1-onset/.3):0;
       el.style.setProperty('--spark-alpha',burst.toFixed(3));
       el.style.setProperty('--spark-radius',((1-burst)*.7).toFixed(3)+'em');
