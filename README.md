@@ -14,7 +14,7 @@
 | Web Motion Atlas | [開啟](https://christorng.idv.tw/ProjectionLabs/motion-atlas/) | [motion-atlas/](motion-atlas/) | 移植原有 48 種 CSS 單效果圖鑑，含強度／技術分類、收藏、時間軸、互動及捲動效果、能力偵測與獨立 HTML 下載。 |
 | 音樂動態實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/music-motion/) | [music-motion/](music-motion/) | 移植原有七類、64 種非空效果及 12 組預設。以音量、頻段、節奏控制 Canvas 背景、文字、光影與換頁；支援示範音樂、本機檔案、麥克風與無聲模擬。 |
 | 光的筆跡／詩歌手繪 | [開啟](https://christorng.idv.tw/ProjectionLabs/ink-song/) | [ink-song/](ink-song/) | 移植原有 80 秒、六段落的 SVG 詩歌播放器：逐筆落筆、色塊累積、場景延續、循環擦除，支援歌詞編輯、節拍音與繪畫／快轉倍率。 |
-| 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |\n| 逐字節拍同步 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) | [lyrics-beat-sync/](lyrics-beat-sync/) | 104 BPM 多種節奏示範、28 個獨立效果、11 組預設，採用 ASS 卡拉 OK 單檔逐音節時間、長音與休止匯入匯出。 |
+| 歌詞文字效果 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics/) | [lyrics/](lyrics/) | 48 種效果：低調呼吸、遮罩揭露、逐字動畫、光與材質、立體變形、誇張特效。 |\n| 逐字節拍同步 | [開啟](https://christorng.idv.tw/ProjectionLabs/lyrics-beat-sync/) | [lyrics-beat-sync/](lyrics-beat-sync/) | 104 BPM 多種節奏示範、28 個獨立效果、11 組預設，WebVTT 優先、ASS 相容的單檔逐字時間匯入匯出，支援休止、長音與估算提示。 |
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
@@ -117,6 +117,16 @@ ProjectionLabs/
 - 可單獨調字體大小、放大幅度、水平／垂直偏移、顏色、陰影、描邊、底線、球大小和跳高。點選時間軸字元可定位到起音點。
 - **單一 ASS 卡拉 OK 檔**：Dialogue 記錄整句起迄，`\k`、`\kf` 等標準標記以百分之一秒記錄每個音節的持續時間；空音節的 `\k` 表示句中休止。匯入後不再估算每字時間，沒有時間標記的普通 ASS Dialogue 將明確拒絕。
 - 純 HTML/CSS/JS，離線獨立播放器直接內嵌 ASS 字幕、樣式與聲音引擎，匯出可保留目前啟用的效果組合。
+
+### WebVTT 與 ASS 雙格式（v5）
+
+實驗室優先使用 [demo.vtt](lyrics-beat-sync/demo.vtt) 作為示範來源；保留 [demo.ass](lyrics-beat-sync/demo.ass) 相容。兩種檔案均可獨立承載字幕時間，不需要 SRT + JSON 或外掛。它們解析到相同的內部 `lines[].words[].start/end` 時間軸，原本所有動畫與跳球不必重寫。
+
+- **WebVTT**：支援帶行內 `<00:00:01.500>` karaoke 時間標記的句型；也支援只有整句起迄的 OBS/Whisper 一般 VTT。後者逐字時間並非真實辨識結果，使用均分估算並標示「逐字時間為估算」。每個字獨立一個 Cue 時也能讀取，但會以各 Cue 作為一行，使用本實驗室的行內標記格式更容易重建整句。
+- **長音及休止**：匯出 WebVTT 時以合法的行內時間標記，搭配零寬空白音節，將休止區間和發聲時間分開；其他軟體可能忽略休止的特殊區分，但字幕文字與時間標記仍有效。WebVTT 時間精度為毫秒，ASS `\\k` 為百分之一秒。
+- **ASS**：仍支援 `\\k`、`\\K`、`\\kf`、`\\ko`，作為專業卡拉 OK 製作流程的交換格式。
+- **節拍 metadata**：WebVTT 使用合法 `NOTE ProjectionLabs BPM=104 BeatsPerBar=4 BeatOffset=0`；ASS 使用註解。它們不是 WebVTT / ASS 標準的節拍欄位，外部工具可忽略；歌詞與逐字時間不依賴 metadata。
+- 匯出 HTML 時，內嵌 WebVTT 及完整播放器，不依賴原始字幕檔或網路。
 
 ### 跳球的時值與跨頁運動（v3）
 
