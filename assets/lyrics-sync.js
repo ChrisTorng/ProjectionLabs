@@ -390,10 +390,17 @@ function renderAt(t){
       el.style.setProperty('--piece-p',clamp(onset/.48,0,1).toFixed(4));
       el.style.setProperty('--piece-opacity',clamp(onset/.25,0,1).toFixed(4));
       el.style.setProperty('--fall',(Math.pow(1-ease,2)*-1.8).toFixed(3)+'em');
-      el.style.setProperty('--under-progress',state.fx.has('underline')?p.toFixed(3):'0');
-      el.style.setProperty('--under-opacity',state.fx.has('underline')&&onset>=0?'1':'0');
-      const color=(singing||onset>=0&&(reveal!=='none'||state.fx.has('color')))?o.accentColor:o.baseColor;
-      el.style.setProperty('--active',color);
+      // Repaint color and underline independently of movement at each word onset.
+      const ink=state.fx.has('color')&&onset>=0?o.accentColor:o.baseColor;
+      const outline=el.querySelector('.glyph-outline');
+      const targetInk=reveal==='none'?ink:'';
+      if(outline.style.color!==targetInk)outline.style.color=targetInk;
+      const under=el.querySelector('.underline');
+      const showUnder=state.fx.has('underline')&&onset>=0;
+      under.style.opacity=showUnder?'1':'0';
+      under.style.transform=`scaleX(${state.fx.has('underline')?p.toFixed(3):'0'})`;
+      under.style.backgroundColor=o.accentColor;
+      under.style.boxShadow=`0 0 6px ${o.accentColor}`;
       const glow=state.fx.has('glow')?(singing?o.shadow*1.8:o.shadow*.35):0;
       const shadow=state.fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
       const blur=Math.max(shadow,glow);
@@ -845,15 +852,22 @@ function previewPaintWord(el,i,t,fx,o,phase){
   el.style.setProperty('--alpha',fx.has('fade')?(onset<0?0:Math.min(1,onset/.18)*(1-.62*fadeOut)):1);
   const reveal=ALL_FX.find(f=>f.group==='reveal'&&fx.has(f.id))?.id||(fx.has('ball-ink')?'fill-down':'none');
   const fill=reveal==='glyph-fall'?ease:reveal==='assemble'?clamp(onset/.43,0,1):p;
-  el.dataset.drawn=reveal;
+  if(el.dataset.drawn!==reveal)el.dataset.drawn=reveal;
   el.style.setProperty('--reveal',(fx.has('ball-ink')&&onset>=0?clamp(onset/.35,0,1)*100:fill*100).toFixed(2)+'%');
   el.style.setProperty('--piece-p',clamp(onset/.42,0,1).toFixed(4));
   el.style.setProperty('--piece-opacity',reveal==='assemble'?clamp(onset/.24,0,1).toFixed(4):'0');
   el.style.setProperty('--fall',(Math.pow(1-ease,2)*-1.8).toFixed(3)+'em');
-  el.style.setProperty('--under-progress',fx.has('underline')?p.toFixed(3):'0');
-  el.style.setProperty('--under-opacity',fx.has('underline')&&onset>=0?'1':'0');
-  const color=fx.size===0?o.baseColor:(singing||(onset>=0&&(reveal!=='none'||fx.has('color')))?o.accentColor:o.baseColor);
-  el.style.setProperty('--active',color);
+  // Direct text/underline paint avoids delayed inherited custom-property updates.
+  const ink=fx.has('color')&&onset>=0?o.accentColor:o.baseColor;
+  const outline=el.querySelector('.glyph-outline');
+  const targetInk=reveal==='none'?ink:'';
+  if(outline.style.color!==targetInk)outline.style.color=targetInk;
+  const under=el.querySelector('.underline');
+  const showUnder=fx.has('underline')&&onset>=0;
+  under.style.opacity=showUnder?'1':'0';
+  under.style.transform=`scaleX(${fx.has('underline')?p.toFixed(3):'0'})`;
+  under.style.backgroundColor=o.accentColor;
+  under.style.boxShadow=`0 0 6px ${o.accentColor}`;
   const glow=fx.has('glow')?(singing?o.shadow*1.65:o.shadow*.35):0;
   const shadow=fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
   const blur=Math.max(glow,shadow);
@@ -899,17 +913,21 @@ function previewDrawBall(item,t,fx,o){
     impact.style.setProperty('--mini-burst',`${(8+dt*80).toFixed(2)}px`);
   }
 }
+function paintMiniItem(item,t,beat,phase){
+  const fx=item.fx,o=item.settings;
+  item.glyphs.forEach((g,i)=>previewPaintWord(g,i,t,fx,o,phase));
+  item.markers.forEach((b,i)=>b.classList.toggle('on',beat===i));
+  previewDrawBall(item,t,fx,o);
+}
 function paintMiniFrame(t){
   const beat=Math.floor(t/MINI_BEAT)%4;
   const phase=(t%MINI_BEAT)/MINI_BEAT;
-  for(const item of miniItems){
-    if(!item.visible)continue;
-    const fx=item.fx,o=item.settings;
-    item.glyphs.forEach((g,i)=>previewPaintWord(g,i,t,fx,o,phase));
-    item.markers.forEach((b,i)=>b.classList.toggle('on',beat===i));
-    previewDrawBall(item,t,fx,o);
+  for(const item of miniItems)if(item.visible)paintMiniItem(item,t,beat,phase);
+  const currentBeatLabel=$('#mini-count');
+  if(currentBeatLabel && currentBeatLabel.dataset.beat!==String(beat)){
+    currentBeatLabel.dataset.beat=String(beat);
+    currentBeatLabel.textContent=`${beat+1} / 4`;
   }
-  const currentBeatLabel=$('#mini-count');if(currentBeatLabel && currentBeatLabel.dataset.beat!==String(beat)){currentBeatLabel.dataset.beat=String(beat);currentBeatLabel.textContent=`${beat+1} / 4`;}
 }
 function miniTime(now){return ((miniRun?(now-miniAnchor)/1000:miniFrozen)%MINI_DURATION+MINI_DURATION)%MINI_DURATION;}
 function miniTick(now){paintMiniFrame(miniTime(now));miniFrame=requestAnimationFrame(miniTick);}
@@ -938,13 +956,25 @@ function initSyncedPreviews(){
     const fx=new Set(kind==='preset'?PRESETS[id].fx:kind==='single'?[id]:[]);
     const settings=miniSettings({kind,id});
     root.style.setProperty('--highlight',settings.accentColor);root.style.setProperty('--inactive',settings.baseColor);
+    root.style.setProperty('--active',settings.accentColor);
     root.style.setProperty('--stroke-size',(settings.stroke||1.5)+'px');root.style.setProperty('--underline-size',(settings.underline||3)+'px');
     root.style.setProperty('--shift-x',fx.has('shift')?settings.moveX+'px':'0px');
     root.style.setProperty('--shift-y',fx.has('shift')?settings.moveY+'px':'0px');
     root.style.setProperty('--stage-bg',settings.bgColor);
     return {root,kind,id,fx,settings,row:root.querySelector('.mini-lyrics'),glyphs:[...root.querySelectorAll('.mini-glyph')],ball:root.querySelector('.mini-ball'),impact:root.querySelector('.mini-impact'),markers:[...root.querySelectorAll('.mini-beats b')],visible:true};
   });
-  miniObserver=new IntersectionObserver(entries=>{for(const entry of entries){const item=miniItems.find(x=>x.root===entry.target);if(item)item.visible=entry.isIntersecting;}},{rootMargin:'180px'});
+  const miniLookup=new Map(miniItems.map(item=>[item.root,item]));
+  miniObserver=new IntersectionObserver(entries=>{
+    const now=miniTime(performance.now()),beat=Math.floor(now/MINI_BEAT)%4,phase=(now%MINI_BEAT)/MINI_BEAT;
+    for(const entry of entries){
+      const item=miniLookup.get(entry.target);
+      if(!item)continue;
+      const wasVisible=item.visible;
+      item.visible=entry.isIntersecting;
+      // Catch newly visible cards up to the SAME clock immediately.
+      if(item.visible&&!wasVisible)paintMiniItem(item,now,beat,phase);
+    }
+  },{rootMargin:'180px'});
   miniItems.forEach(item=>miniObserver.observe(item.root));
   miniAnchor=performance.now();miniTick(miniAnchor);
   $('#mini-play').addEventListener('click',()=>{
