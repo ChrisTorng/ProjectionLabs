@@ -139,3 +139,25 @@
 .projection-lyrics .glyph-outline,
 .projection-lyrics .glyph .underline{transition:none!important}
 .karaoke-preview .mini-glyph .underline{will-change:transform}
+
+/* V8: avoid stale GPU raster on Windows/Chromium. Gray glyphs are stationary;
+   the precached accent layer is composited at each exact syllable onset. */
+.projection-lyrics .glyph,.karaoke-preview .mini-glyph{will-change:auto}
+.projection-lyrics .glyph[data-drawn=none] .glyph-solid{
+  clip-path:none!important;
+  opacity:0;
+  will-change:opacity;
+  color:var(--highlight,#ffe1a1);
+  transition:none!important;
+}
+.karaoke-preview .mini-glyph[data-drawn=none] .glyph-solid{
+  clip-path:none!important;
+  opacity:0;
+  color:var(--highlight,#90f7df);
+  transition:none!important;
+}
+.projection-lyrics .glyph .underline,.karaoke-preview .mini-glyph .underline{
+  background:var(--underline-ink,var(--highlight,#ffe1a1));
+  box-shadow:0 0 6px var(--underline-ink,var(--highlight,#ffe1a1));
+  transition:none!important;
+}
