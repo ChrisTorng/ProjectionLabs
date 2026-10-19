@@ -83,6 +83,7 @@ function setStyle(){
   stage.style.setProperty('--highlight',o.accentColor);
   stage.style.setProperty('--inactive',o.baseColor);
   stage.style.setProperty('--active',o.accentColor);
+  stage.style.setProperty('--underline-ink',o.accentColor);
   stage.style.setProperty('--lyric-font',o.fontSize+'cqw');
   stage.style.setProperty('--stroke-size',o.stroke+'px');
   stage.style.setProperty('--underline-size',o.underline+'px');
@@ -391,16 +392,22 @@ function renderAt(t){
       el.style.setProperty('--piece-opacity',clamp(onset/.25,0,1).toFixed(4));
       el.style.setProperty('--fall',(Math.pow(1-ease,2)*-1.8).toFixed(3)+'em');
       // Repaint color and underline independently of movement at each word onset.
-      const ink=state.fx.has('color')&&onset>=0?o.accentColor:o.baseColor;
       const outline=el.querySelector('.glyph-outline');
-      const targetInk=reveal==='none'?ink:'';
+      const targetInk=reveal==='none'?o.baseColor:'';
       if(outline.style.color!==targetInk)outline.style.color=targetInk;
+      // Accent glyph is prepainted from the beginning. Onsets only change its opacity,
+      // avoiding delayed GPU text-raster invalidation while the ball keeps moving.
+      const solid=el.querySelector('.glyph-solid');
+      if(reveal==='none'){
+        const inkVisible=state.fx.has('color')&&onset>=0?'1':'0';
+        if(solid.style.opacity!==inkVisible)solid.style.opacity=inkVisible;
+      }else if(solid.style.opacity)solid.style.removeProperty('opacity');
       const under=el.querySelector('.underline');
       const showUnder=state.fx.has('underline')&&onset>=0;
-      under.style.opacity=showUnder?'1':'0';
-      under.style.transform=`scaleX(${state.fx.has('underline')?p.toFixed(3):'0'})`;
-      under.style.backgroundColor=o.accentColor;
-      under.style.boxShadow=`0 0 6px ${o.accentColor}`;
+      const opacity=showUnder?'1':'0';
+      if(under.style.opacity!==opacity)under.style.opacity=opacity;
+      const transform=`scaleX(${state.fx.has('underline')?p.toFixed(3):'0'})`;
+      if(under.style.transform!==transform)under.style.transform=transform;
       const glow=state.fx.has('glow')?(singing?o.shadow*1.8:o.shadow*.35):0;
       const shadow=state.fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
       const blur=Math.max(shadow,glow);
@@ -858,16 +865,20 @@ function previewPaintWord(el,i,t,fx,o,phase){
   el.style.setProperty('--piece-opacity',reveal==='assemble'?clamp(onset/.24,0,1).toFixed(4):'0');
   el.style.setProperty('--fall',(Math.pow(1-ease,2)*-1.8).toFixed(3)+'em');
   // Direct text/underline paint avoids delayed inherited custom-property updates.
-  const ink=fx.has('color')&&onset>=0?o.accentColor:o.baseColor;
   const outline=el.querySelector('.glyph-outline');
-  const targetInk=reveal==='none'?ink:'';
+  const targetInk=reveal==='none'?o.baseColor:'';
   if(outline.style.color!==targetInk)outline.style.color=targetInk;
+  const solid=el.querySelector('.glyph-solid');
+  if(reveal==='none'){
+    const inkVisible=fx.has('color')&&onset>=0?'1':'0';
+    if(solid.style.opacity!==inkVisible)solid.style.opacity=inkVisible;
+  }else if(solid.style.opacity)solid.style.removeProperty('opacity');
   const under=el.querySelector('.underline');
   const showUnder=fx.has('underline')&&onset>=0;
-  under.style.opacity=showUnder?'1':'0';
-  under.style.transform=`scaleX(${fx.has('underline')?p.toFixed(3):'0'})`;
-  under.style.backgroundColor=o.accentColor;
-  under.style.boxShadow=`0 0 6px ${o.accentColor}`;
+  const opacity=showUnder?'1':'0';
+  if(under.style.opacity!==opacity)under.style.opacity=opacity;
+  const transform=`scaleX(${fx.has('underline')?p.toFixed(3):'0'})`;
+  if(under.style.transform!==transform)under.style.transform=transform;
   const glow=fx.has('glow')?(singing?o.shadow*1.65:o.shadow*.35):0;
   const shadow=fx.has('shadow')?(singing?o.shadow*(.4+.6*impulse):o.shadow*.17):0;
   const blur=Math.max(glow,shadow);
@@ -930,7 +941,12 @@ function paintMiniFrame(t){
   }
 }
 function miniTime(now){return ((miniRun?(now-miniAnchor)/1000:miniFrozen)%MINI_DURATION+MINI_DURATION)%MINI_DURATION;}
-function miniTick(now){paintMiniFrame(miniTime(now));miniFrame=requestAnimationFrame(miniTick);}
+// Gallery is subordinate to the live projection; it runs at 24fps max.
+let miniLastPaint=-Infinity;
+function miniTick(now){
+  if(miniRun&&now-miniLastPaint>=1000/24){miniLastPaint=now;paintMiniFrame(miniTime(now));}
+  miniFrame=requestAnimationFrame(miniTick);
+}
 function miniStopSound(){miniSoundOn=false;clearInterval(miniScheduler);miniScheduler=0;$('#mini-sound').textContent='開啟節拍聲';$('#mini-sound').setAttribute('aria-pressed','false');}
 function miniAudioTick(){
   if(!miniSoundOn||!miniAudio||!miniRun)return;
@@ -957,6 +973,7 @@ function initSyncedPreviews(){
     const settings=miniSettings({kind,id});
     root.style.setProperty('--highlight',settings.accentColor);root.style.setProperty('--inactive',settings.baseColor);
     root.style.setProperty('--active',settings.accentColor);
+    root.style.setProperty('--underline-ink',settings.accentColor);
     root.style.setProperty('--stroke-size',(settings.stroke||1.5)+'px');root.style.setProperty('--underline-size',(settings.underline||3)+'px');
     root.style.setProperty('--shift-x',fx.has('shift')?settings.moveX+'px':'0px');
     root.style.setProperty('--shift-y',fx.has('shift')?settings.moveY+'px':'0px');
@@ -978,7 +995,7 @@ function initSyncedPreviews(){
   miniItems.forEach(item=>miniObserver.observe(item.root));
   miniAnchor=performance.now();miniTick(miniAnchor);
   $('#mini-play').addEventListener('click',()=>{
-    if(miniRun){miniFrozen=miniTime(performance.now());miniRun=false;miniStopSound();}
+    if(miniRun){miniFrozen=miniTime(performance.now());miniRun=false;miniStopSound();paintMiniFrame(miniFrozen);}
     else{miniRun=true;miniAnchor=performance.now()-miniFrozen*1000;miniSeedAudio();}
     $('#mini-play').textContent=miniRun?'暫停預覽':'播放預覽';
   });
