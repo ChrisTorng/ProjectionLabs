@@ -132,3 +132,10 @@
 .karaoke-preview .mini-beats b.on{background:var(--highlight,#85e8da);opacity:1;box-shadow:0 0 8px var(--highlight,#85e8da);transform:scale(1.3)}
 @media(max-width:980px){.fx-group-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.fx-group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.karaoke-preview.fx-preview{height:108px;min-height:108px}.karaoke-preview.preset-card-preview{height:124px;min-height:124px}.mini-actions{width:100%}}
+/* V7: explicit, immediate paint for karaoke word onsets. */
+.karaoke-preview .mini-glyph{will-change:auto}
+.karaoke-preview .mini-glyph .glyph-outline,
+.karaoke-preview .mini-glyph .underline,
+.projection-lyrics .glyph-outline,
+.projection-lyrics .glyph .underline{transition:none!important}
+.karaoke-preview .mini-glyph .underline{will-change:transform}
