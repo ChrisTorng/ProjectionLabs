@@ -67,8 +67,8 @@ function stageHTML(c,which){
     ${s.load}
     ${s.js}
   `;
-  const safeScript=script.replace(/<\\/script/gi,'<\\/script');
-  return '<!doctype html><html lang="zh-Hant"'+(!playing?' class="stage-paused"':'')+'><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHTML(c.title)+'</title><style>'+baseCSS+'\n'+s.css+'</style></head><body><div class="demo">'+s.html+'</div><script>'+safeScript+'<\\/script></body></html>';
+  const safeScript=script;
+  return '<!doctype html><html lang="zh-Hant"'+(!playing?' class="stage-paused"':'')+'><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHTML(c.title)+'</title><style>'+baseCSS+'\n'+s.css+'</style></head><body><div class="demo">'+s.html+'</div><script>'+safeScript+'</script></body></html>';
 }
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function support(c){
