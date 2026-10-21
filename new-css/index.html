@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新世代 CSS 實驗室｜ProjectionLabs</title>
+<meta name="description" content="Chrome 與 Edge 穩定版新 CSS 技術實驗：視覺、降低 JavaScript、動畫效能與影格穩定度比較">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=20261022-1">
+</head>
+<body>
+<header class="topbar">
+  <a class="back" href="../" aria-label="返回 ProjectionLabs 首頁">← ProjectionLabs</a>
+  <div class="top-title">NEW CSS <span>/</span> LABORATORY <small>2026</small></div>
+  <div class="runtime"><span class="signal"></span><span id="browser">檢查瀏覽器…</span></div>
+</header>
+<main class="layout">
+  <aside class="sidebar">
+    <div class="side-head">
+      <p class="overline">CHROMIUM STABLE / 2026</p>
+      <h1>新 CSS<br><em>技術實驗室</em></h1>
+      <p class="deck">不只比較視覺。也比較 JS 需求、主執行緒負擔、維護成本與影格穩定度。</p>
+      <input id="search" type="search" placeholder="搜尋功能、CSS、優勢…" aria-label="搜尋實驗案例">
+      <div class="filter-group" role="group" aria-label="案例分類">
+        <button class="filter active" data-filter="all">全部</button>
+        <button class="filter" data-filter="visual">新視覺</button>
+        <button class="filter" data-filter="less-js">減少 JS</button>
+        <button class="filter" data-filter="smooth">效能／流暢</button>
+      </div>
+    </div>
+    <div class="case-list" id="caseList" aria-label="實驗案例"></div>
+    <p class="side-foot">僅納入截至 2026-10-22 已發布之 Chrome、Edge 穩定版功能；實際支援依當前瀏覽器即時偵測。<br><a href="https://developer.chrome.com/release-notes/" target="_blank" rel="noopener">Chromium 發布資訊 ↗</a></p>
+  </aside>
+  <section class="workspace" aria-label="效果預覽及效能比較">
+    <div class="workspace-header">
+      <div><span id="caseNumber" class="eyebrow">CASE 01</span><h2 id="caseTitle">載入中…</h2><p id="caseDesc"></p></div>
+      <div id="caseTags" class="tags"></div>
+    </div>
+    <div class="compare-bar">
+      <div class="mode-switch" role="group" aria-label="切換作法">
+        <button id="legacyBtn" aria-pressed="false">傳統作法</button>
+        <button id="modernBtn" class="selected" aria-pressed="true">新 CSS 作法</button>
+      </div>
+      <span id="featureState" class="feature-state">支援偵測中</span>
+    </div>
+    <div class="stage-area">
+      <div class="stage-top"><span><i></i> LIVE STAGE <b>16:9</b></span><span id="stageMethod">NATIVE CSS</span></div>
+      <div class="stage-shell" id="stageShell">
+        <iframe id="stage" title="實驗室展示舞台" allowfullscreen></iframe>
+        <div id="unsupported" class="unsupported" hidden><strong>目前瀏覽器不支援此新語法</strong><p>已顯示漸進增強的替代效果。可切到「傳統作法」比較。</p></div>
+      </div>
+      <div class="stage-controls">
+        <button id="playBtn" title="暫停 / 恢復播放">Ⅱ 暫停動畫</button>
+        <button id="resetBtn" title="重新建立舞台">↻ 重播</button>
+        <button id="fullBtn" title="16:9 舞台全螢幕">⛶ 全螢幕</button>
+        <label for="stress">展示物件量 <output id="stressValue">1×</output></label><input id="stress" type="range" min="1" max="5" step="1" value="1">
+      </div>
+    </div>
+    <div class="metrics" aria-label="效能觀察">
+      <div class="metric"><span>顯示器取樣更新率</span><strong id="hz">—</strong><small>由 rAF 估算，非動畫 FPS</small></div>
+      <div class="metric"><span>影格間隔 P95</span><strong id="p95">—</strong><small>越低越穩；受分頁／顯示器影響</small></div>
+      <div class="metric"><span>長任務 ≥50ms</span><strong id="longTasks">—</strong><small>同頁過去 10 秒，非單一效果 CPU</small></div>
+      <div class="metric"><span>舞台 JavaScript</span><strong id="jsActivity">—</strong><small>是否有每影格 DOM 寫入</small></div>
+    </div>
+    <div class="detail-columns">
+      <article class="panel">
+        <div class="panel-label">WHY IT MATTERS</div>
+        <h3>技術優勢與取捨</h3>
+        <p id="caseWhy"></p>
+        <div class="tradeoffs"><div><span>減少 JavaScript</span><strong id="benefitJS">—</strong></div><div><span>動畫／渲染成本</span><strong id="renderCost">—</strong></div><div><span>適用投影情境</span><strong id="useCase">—</strong></div></div>
+        <p class="caution" id="caseCaution"></p>
+      </article>
+      <article class="panel code-panel">
+        <div class="code-head"><div><div class="panel-label">IMPLEMENTATION</div><h3 id="codeTitle">CSS 核心程式碼</h3></div><div class="code-actions"><button id="copyBtn">複製程式碼</button><button id="exportBtn">匯出 HTML</button></div></div>
+        <pre><code id="codeText"></code></pre>
+        <p class="code-note" id="codeNote"></p>
+      </article>
+    </div>
+    <footer class="references"><strong>技術來源</strong><span id="refs"></span><p>數字僅用於比較本頁前景影格取樣與長任務事件；無法直接代表 CPU 使用率。要量化 CPU、Layout、Paint 與 Compositing，請搭配 Chrome／Edge DevTools → Performance 錄製，並在相同條件下比較兩種作法。測試時盡量只開啟此頁且維持前景。</p></footer>
+  </section>
+</main>
+<script type="module" src="app.js?v=20261022-1"></script>
+</body>
+</html>
