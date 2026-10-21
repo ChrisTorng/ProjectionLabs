@@ -53,10 +53,10 @@ function particleSetup(){
   })();
   `;
 }
-function stageHTML(c,which){
+function stageHTML(c,which,forExport=false){
   const s=source(c,which);
   const script=`
-    window.stagePaused=${!playing};
+    window.stagePaused=${!playing && !forExport};
     addEventListener('message',event=>{
       if(event.data?.type==='labPause'){
         window.stagePaused=!!event.data.paused;
@@ -68,7 +68,7 @@ function stageHTML(c,which){
     ${s.js}
   `;
   const safeScript=script;
-  return '<!doctype html><html lang="zh-Hant"'+(!playing?' class="stage-paused"':'')+'><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHTML(c.title)+'</title><style>'+baseCSS+'\n'+s.css+'</style></head><body><div class="demo">'+s.html+'</div><script>'+safeScript+'</script></body></html>';
+  return '<!doctype html><html lang="zh-Hant"'+(!playing&&!forExport?' class="stage-paused"':'')+'><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHTML(c.title)+'</title><style>'+baseCSS+'\n'+s.css+'</style></head><body><div class="demo">'+s.html+'</div><script>'+safeScript+'</script></body></html>';
 }
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function support(c){
@@ -80,7 +80,7 @@ function inspectFunctionSupport(){
   try{
     const el=stage.contentDocument.querySelector('.f-panel.a');
     const value=getComputedStyle(el).backgroundImage;
-    const ok=value.includes('gradient');
+    const ok=value.includes('rgb(3, 185, 199)')||value.includes('#03b9c7');
     updateSupportBadge(ok);
   }catch{updateSupportBadge(false);}
 }
@@ -190,7 +190,7 @@ $('copyBtn').onclick=async()=>{
   }
 };
 $('exportBtn').onclick=()=>{
-  const blob=new Blob([stageHTML(current,mode)],{type:'text/html;charset=utf-8'});
+  const blob=new Blob([stageHTML(current,mode,true)],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='ProjectionLabs-new-css-'+current.id+'-'+mode+'.html';
   document.body.append(a);a.click();a.remove();
