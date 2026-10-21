@@ -1,6 +1,6 @@
 # ProjectionLabs
 
-八個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
+九個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
 
 **網站入口：[christorng.idv.tw/ProjectionLabs/](https://christorng.idv.tw/ProjectionLabs/)**
 
@@ -11,6 +11,7 @@
 | 實驗室 | 線上入口 | 原始碼入口 | 簡介 |
 | --- | --- | --- | --- |
 | 動態效果組合室 | [開啟](https://christorng.idv.tw/ProjectionLabs/composer/) | [composer/](composer/) | 移植原有 Motion Composer：七個獨立圖層、65 種非空效果、10 組預設、四種頁面排列／接力模式；三頁可編輯內容與完整播放器 HTML 匯出。 |
+| 新世代 CSS 技術實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/new-css/) | [new-css/](new-css/) | 17 個獨立案例，涵蓋 Chromium 2025–2026 已推出的新 CSS 與效能最佳實務。可切換傳統／新 CSS、複製程式碼、匯出單檔 HTML，並觀察前景影格間隔與長任務。 |
 | Web Motion Atlas | [開啟](https://christorng.idv.tw/ProjectionLabs/motion-atlas/) | [motion-atlas/](motion-atlas/) | 移植原有 48 種 CSS 單效果圖鑑，含強度／技術分類、收藏、時間軸、互動及捲動效果、能力偵測與獨立 HTML 下載。 |
 | 音樂動態實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/music-motion/) | [music-motion/](music-motion/) | 移植原有七類、64 種非空效果及 12 組預設。以音量、頻段、節奏控制 Canvas 背景、文字、光影與換頁；支援示範音樂、本機檔案、麥克風與無聲模擬。 |
 | 光的筆跡／詩歌手繪 | [開啟](https://christorng.idv.tw/ProjectionLabs/ink-song/) | [ink-song/](ink-song/) | 移植原有 80 秒、六段落的 SVG 詩歌播放器：逐筆落筆、色塊累積、場景延續、循環擦除，支援歌詞編輯、節拍音與繪畫／快轉倍率。 |
@@ -18,7 +19,7 @@
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
-共 **8 個獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
+共 **9 個已列於首頁的獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
 
 ## 既有成品的移植範圍
 
@@ -92,6 +93,7 @@ python -m http.server 8000
 ```text
 ProjectionLabs/
 ├── index.html           # 實驗室總入口
+├── new-css/index.html # 新 CSS／效能比較實驗室
 ├── composer/index.html  # 原有七層組合播放器
 ├── motion-atlas/index.html # 原有單效果圖鑑
 ├── music-motion/index.html # 音樂反應圖層
@@ -186,3 +188,4 @@ Dialogue: 0,0:00:00.00,0:00:03.38,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf
 - [MDN — CSS Motion Path](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Motion_path)
 
 授權：[MIT](LICENSE)。
+\n## 新世代 CSS 技術實驗室（2026-10-22）\n\n入口：[新 CSS 實驗室](https://christorng.idv.tw/ProjectionLabs/new-css/)；程式碼位於 `new-css/`，不修改既有效果定義。\n\n包含 **17 個案例**：非圓形轉角、異形框線、CSS 自訂函式、Grid gap decorations、原生錨點定位、scroll-triggered 動畫、scroll-state、sibling-index 逐字延遲、text-fit、text-decoration-inset、contrast-color、自動進場樣式、Popover、View Transition、離屏 content-visibility、CSS transform 與 JS left/top 對照、原生 scroll-marker 分頁。\n\n每一項均提供個別技術特性、JS 簡化效益、預期 Layout／Paint／Compositor 取捨、Chrome／Edge 相關支援偵測、示範預覽、舊／新切換與可匯出的單檔範例。效能面板測量的是**目前頁面 requestAnimationFrame 的更新頻率與影格間隔 P95、全頁近 10 秒 Long Tasks 次數**；不是 CPU 百分比，也不是獨立 iframe 的 Paint／GPU 次數。真正比較 CPU 與 rendering workload，請用同一台電腦的 DevTools Performance 逐一錄製兩種模式。\n\n`content-visibility`、GPU 友善 `transform` 對照是刻意保留的舊技術效能最佳實務，不冒充 2026 新推出功能。`@function`、`corner-shape` 等新能力不保證一定降低 CPU；CSS 渲染操作仍可能有主執行緒 Paint 成本。\n\n技術來源：[Chrome Release Notes](https://developer.chrome.com/release-notes/) · [Chrome 149 Gap Decorations](https://developer.chrome.com/blog/gap-decorations-stable) · [Josh W. Comeau — Interop 2027](https://www.joshwcomeau.com/css/interop-2027/) · [MDN CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)。\n
