@@ -85,7 +85,7 @@ export const groupA = [
     ],
     "html": "<div class=\"function-wrap\"><div class=\"f-panel a\">天空色 / 01</div><div class=\"f-panel b\">晨光色 / 02</div><div class=\"f-panel c\">紫羅蘭 / 03</div></div>",
     "oldCSS": ".function-wrap{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}.f-panel{width:175px;height:180px;border-radius:22px;padding:26px;display:flex;align-items:end;font-weight:800;box-shadow:0 15px 20px #0004}.a{background:linear-gradient(150deg,#03b9c7,#4273ad)}.b{background:linear-gradient(150deg,#e4a76e,#84517c)}.c{background:linear-gradient(150deg,#9762d8,#44358f)}",
-    "css": "@function --stage-tone(--first <color>, --last <color>: #4273ad) { result: linear-gradient(150deg, var(--first), var(--last)); }\n.function-wrap{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}.f-panel{width:175px;height:180px;border-radius:22px;padding:26px;display:flex;align-items:end;font-weight:800;box-shadow:0 15px 20px #0004}.a{background:--stage-tone(#03b9c7)}.b{background:--stage-tone(#e4a76e,#84517c)}.c{background:--stage-tone(#9762d8,#44358f)}"
+    "css": "@function --stage-tone(--first <color>, --last <color>: #4273ad) { result: linear-gradient(150deg, var(--first), var(--last)); }\n.function-wrap{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}.f-panel{width:175px;height:180px;border-radius:22px;padding:26px;display:flex;align-items:end;font-weight:800;box-shadow:0 15px 20px #0004}.a{background:linear-gradient(150deg,#03b9c7,#4273ad);background:--stage-tone(#03b9c7)}.b{background:linear-gradient(150deg,#e4a76e,#84517c);background:--stage-tone(#e4a76e,#84517c)}.c{background:linear-gradient(150deg,#9762d8,#44358f);background:--stage-tone(#9762d8,#44358f)}"
   },
   {
     "id": "gap-decor",
