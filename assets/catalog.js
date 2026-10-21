@@ -4,6 +4,7 @@ export const labs = [
   { id: 'transitions', title: '投影片轉場效果', subtitle: '淡入、推進、百葉窗、翻頁與空間切換', color: '#ffc078', icon: '▱', module: 'transitions.js', description: '以相鄰投影片實際切換，觀察進場與退場如何搭配。適合歌詞、簡報與投影畫面。' },
   { id: 'backgrounds', title: '動態背景效果', subtitle: '安靜的光場，到流動色彩與幾何舞台', color: '#beabff', icon: '◌', module: 'backgrounds.js', description: '用純 CSS 漸層、遮罩與幾何圖樣建立背景，保持歌詞在前景清楚可讀。' },
   { id: 'composer', title: '效果組合室', subtitle: '七層效果、三頁接力與完整播放器匯出', color: '#7de4cd' },
+  { id: 'new-css', title: '新世代 CSS 技術實驗室', subtitle: '17 個實例：最新 CSS、JS 簡化與效能比較', color: '#80f4cf' },
   { id: 'motion-atlas', title: 'Web Motion Atlas', subtitle: '48 種單效果圖鑑、時間軸與獨立 HTML', color: '#8baaff' },
   { id: 'music-motion', title: '音樂動態', subtitle: '聲音、頻段與節奏驅動的圖層組合', color: '#ffc078' },
   { id: 'ink-song', title: '詩歌手繪', subtitle: '隨拍逐筆繪製、累積與擦除', color: '#b9cd9e' },
