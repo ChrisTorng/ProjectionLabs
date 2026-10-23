@@ -1,6 +1,6 @@
 # ProjectionLabs
 
-九個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
+十個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
 
 **網站入口：[christorng.idv.tw/ProjectionLabs/](https://christorng.idv.tw/ProjectionLabs/)**
 
@@ -11,6 +11,7 @@
 | 實驗室 | 線上入口 | 原始碼入口 | 簡介 |
 | --- | --- | --- | --- |
 | 動態效果組合室 | [開啟](https://christorng.idv.tw/ProjectionLabs/composer/) | [composer/](composer/) | 移植原有 Motion Composer：七個獨立圖層、65 種非空效果、10 組預設、四種頁面排列／接力模式；三頁可編輯內容與完整播放器 HTML 匯出。 |
+| HTML-in-Canvas 原生實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/html-in-canvas/) | [html-in-canvas/](html-in-canvas/) | 7 個獨立場景：真實 HTML 排版、表單互動、2D 多層特效、卡片動畫、WebGL 原生 HTML 紋理、事件式重繪與 16:9 投影。偵測 Origin Trial 並區分原生/替代模式。 |
 | 新世代 CSS 技術實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/new-css/) | [new-css/](new-css/) | 17 個獨立案例，涵蓋 Chromium 2025–2026 已推出的新 CSS 與效能最佳實務。可切換傳統／新 CSS、複製程式碼、匯出單檔 HTML，並觀察前景影格間隔與長任務。 |
 | Web Motion Atlas | [開啟](https://christorng.idv.tw/ProjectionLabs/motion-atlas/) | [motion-atlas/](motion-atlas/) | 移植原有 48 種 CSS 單效果圖鑑，含強度／技術分類、收藏、時間軸、互動及捲動效果、能力偵測與獨立 HTML 下載。 |
 | 音樂動態實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/music-motion/) | [music-motion/](music-motion/) | 移植原有七類、64 種非空效果及 12 組預設。以音量、頻段、節奏控制 Canvas 背景、文字、光影與換頁；支援示範音樂、本機檔案、麥克風與無聲模擬。 |
@@ -19,7 +20,7 @@
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
-共 **9 個已列於首頁的獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
+共 **10 個已列於首頁的獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
 
 ## 既有成品的移植範圍
 
@@ -93,6 +94,7 @@ python -m http.server 8000
 ```text
 ProjectionLabs/
 ├── index.html           # 實驗室總入口
+├── html-in-canvas/index.html # HTML-in-Canvas 原生 API 與替代模式
 ├── new-css/index.html # 新 CSS／效能比較實驗室
 ├── composer/index.html  # 原有七層組合播放器
 ├── motion-atlas/index.html # 原有單效果圖鑑
@@ -189,3 +191,30 @@ Dialogue: 0,0:00:00.00,0:00:03.38,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf
 
 授權：[MIT](LICENSE)。
 \n## 新世代 CSS 技術實驗室（2026-10-22）\n\n入口：[新 CSS 實驗室](https://christorng.idv.tw/ProjectionLabs/new-css/)；程式碼位於 `new-css/`，不修改既有效果定義。\n\n包含 **17 個案例**：非圓形轉角、異形框線、CSS 自訂函式、Grid gap decorations、原生錨點定位、scroll-triggered 動畫、scroll-state、sibling-index 逐字延遲、text-fit、text-decoration-inset、contrast-color、自動進場樣式、Popover、View Transition、離屏 content-visibility、CSS transform 與 JS left/top 對照、原生 scroll-marker 分頁。\n\n每一項均提供個別技術特性、JS 簡化效益、預期 Layout／Paint／Compositor 取捨、Chrome／Edge 相關支援偵測、示範預覽、舊／新切換與可匯出的單檔範例。效能面板測量的是**目前頁面 requestAnimationFrame 的更新頻率與影格間隔 P95、全頁近 10 秒 Long Tasks 次數**；不是 CPU 百分比，也不是獨立 iframe 的 Paint／GPU 次數。真正比較 CPU 與 rendering workload，請用同一台電腦的 DevTools Performance 逐一錄製兩種模式。\n\n`content-visibility`、GPU 友善 `transform` 對照是刻意保留的舊技術效能最佳實務，不冒充 2026 新推出功能。`@function`、`corner-shape` 等新能力不保證一定降低 CPU；CSS 渲染操作仍可能有主執行緒 Paint 成本。\n\n技術來源：[Chrome Release Notes](https://developer.chrome.com/release-notes/) · [Chrome 149 Gap Decorations](https://developer.chrome.com/blog/gap-decorations-stable) · [Josh W. Comeau — Interop 2027](https://www.joshwcomeau.com/css/interop-2027/) · [MDN CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)。\n
+## HTML-in-Canvas 原生實驗室（2026-10-24）
+
+線上入口：[HTML-in-Canvas](https://christorng.idv.tw/ProjectionLabs/html-in-canvas/) · 原始碼 `html-in-canvas/`。
+
+這是以 [Chrome HTML-in-Canvas Origin Trial](https://developer.chrome.com/blog/html-in-canvas-origin-trial?hl=zh-tw) 為主題的實驗。**此功能仍是實驗性 Origin Trial，不能因為 Chrome／Edge 版本較新就推論一定可以使用。** 需要自行啟用對應 Chrome/Edge 實驗旗標，或將已註冊網域的 Origin Trial Token 部署於頁面。此專案不包含網域專用 token。
+
+### 場景與切換
+
+1. 真實 HTML/CSS 歌詞：保留多行中文字型、樣式、區塊語意。
+2. 互動表單：測試 input、按鈕及 2D 座標命中。
+3. Canvas 2D 多次繪製：模糊光暈、剪裁與合成。
+4. 2D 卡片旋轉：使用 `drawElementImage()` 與 Canvas 變形。
+5. WebGL2 波紋：將 HTML 快照繪入紋理，透過 GLSL 製造扭曲與色差。
+6. 事件式重繪：比較內容改變才畫與逐影格不停畫的架構差異。
+7. 16:9 投影舞台：文字 HTML 與 Canvas 光束的概念驗證。
+
+**三種路徑**：原生實驗性 HTML-in-Canvas（僅在功能偵測成功時開放）、標準 DOM 疊層（不是新 API）、傳統 Canvas 2D 手繪（不是新 API）。畫面左側提供功能偵測，舞台下方提供 JS 呼叫次數、`paint` 事件次數、同步 JS 繪製耗時 P95 與前景頁面影格間隔 P95。這些指標**不是 CPU 或 GPU 使用率**，需搭配 DevTools Performance 診斷 Layout／Paint／Compositor／GPU 的實際成本。
+
+### 版本相容性
+
+- 新版 Canvas 入口 `<canvas content="drawable">`、可畫節點 `drawable`；舊版使用 `layoutsubtree`。實驗室採雙屬性進行過渡期相容。
+- 2D 使用 `CanvasRenderingContext2D.drawElementImage`；舊版會回傳需要同步的 DOMMatrix，Chrome 155+ 改為自動同步。
+- WebGL2：Chrome 155+ `texElementSubImage2D` 必須先分配紋理儲存空間；較舊試用版使用 `texElementImage2D` 不同參數簽章。WebGPU 目前僅提供官方資源參考，這個實驗室沒有冒充已實作 WebGPU。
+- 2D 靜態案例只在 `paint` 或需要更新時繪製；旋轉、光學變形與 WebGL shader 則仍有連續重繪或 GPU 計算成本。對固定字幕而言，一般 DOM 加 CSS 合成動畫可能更節省資源。
+- WebGL shader 產生的紋理扭曲不等於 DOM 命中區域自動扭曲。此案例標示為視覺示範，不宣稱真實 3D 命中測試已同步。
+
+參考：[官方 API 介紹](https://developer.chrome.com/blog/html-in-canvas-origin-trial?hl=zh-tw)、[官方 2026 年 9 月變更](https://developer.chrome.com/blog/html-in-canvas-ot-changes?hl=zh-tw)、[WICG 提案](https://github.com/WICG/html-in-canvas)、[Edge Origin Trial](https://developer.microsoft.com/en-us/microsoft-edge/origin-trials/trials/a297467e-0030-4c4c-8739-48e130026c03)。
