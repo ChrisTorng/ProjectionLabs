@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTML-in-Canvas 原生實驗室｜ProjectionLabs</title>
+<meta name="description" content="探索 Chrome / Edge 實驗性的 HTML-in-Canvas API、DOM 互動、Canvas 2D、WebGL 紋理與效能取捨。">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=20261024-1">
+</head>
+<body>
+<header class="top"><a href="../" class="back">← ProjectionLabs</a><strong>HTML <i>IN</i> CANVAS <span>LAB</span></strong><span class="trial">EXPERIMENTAL · ORIGIN TRIAL</span></header>
+<div class="layout">
+<aside class="sidebar">
+  <p class="kicker">CHROMIUM EXPERIMENTS / 2026</p>
+  <h1>讓 HTML<br>進入 <em>Canvas</em></h1>
+  <p class="lead">以真實 DOM、Canvas 2D 與 WebGL 做混合渲染；逐項對照視覺、互動、重繪與效能。</p>
+  <div class="status-card"><span class="bullet"></span><div><strong id="supportText">正在檢測原生 API…</strong><p id="supportDetail">偵測 drawElementImage 與 WebGL 擴充方法</p></div></div>
+  <nav class="scenes" id="sceneList" aria-label="實驗場景"></nav>
+  <div class="trial-guide">
+    <b>啟用原生實驗功能</b>
+    <p>使用支援的 Chromium 版本，將 <code>chrome://flags/#canvas-draw-element</code> 設為 Enabled 並重啟；或為正式網域註冊 Origin Trial。Edge 需使用對應 Edge 旗標／試用權杖。</p>
+    <button id="copyFlag">複製 Chrome Flag 網址</button>
+  </div>
+</aside>
+<main class="main">
+  <section class="headline">
+    <div><div class="eyebrow" id="sceneIndex">01 / 07 · 2D</div><h2 id="sceneTitle">正在載入…</h2><p id="sceneDesc"></p></div>
+    <div class="chips" id="sceneChips"></div>
+  </section>
+  <div class="trial-banner"><span>!</span><div><strong>原生功能尚未全面推出</strong><p>畫面採用哪一種渲染路徑會清楚標示。Origin Trial 不等於所有穩定版預設支援；沒有啟用時，可以用 DOM 疊層與傳統 Canvas 2D 進行比較。</p></div><a href="https://developer.chrome.com/blog/html-in-canvas-ot-changes?hl=zh-tw" target="_blank" rel="noopener noreferrer">官方版本異動 ↗</a></div>
+  <div class="toolbar">
+    <div class="switch" id="rendererSwitch" role="group" aria-label="渲染路徑">
+      <button data-mode="native">原生 HTML-in-Canvas</button><button data-mode="dom">DOM 疊層</button><button data-mode="raster">傳統 Canvas 2D</button>
+    </div>
+    <span class="renderer-state" id="rendererState">檢查中</span>
+  </div>
+  <div class="frame">
+    <div class="frame-head"><span><b class="live-dot"></b> PROJECTION STAGE <small>16:9</small></span><span id="frameBadge">AUTO DETECT</span></div>
+    <div class="stage" id="stage" aria-label="16 比 9 投影展示舞台"></div>
+    <div class="stage-footer">
+      <button id="playBtn">Ⅱ 暫停動態</button><button id="refreshBtn">↻ 重建場景</button><button id="fullscreenBtn">⛶ 全螢幕</button>
+      <label class="slider">效果強度 <input id="intensity" type="range" min="0" max="100" value="46"> <output id="intensityValue">46%</output></label>
+    </div>
+  </div>
+  <div class="editline"><label for="displayText">展示文字</label><input type="text" id="displayText" value="祢的光照亮我心" maxlength="70"><button id="randomText">替換範例文字</button></div>
+  <div class="stats">
+    <div><span>畫布繪製次數</span><strong id="drawCalls">0</strong><small>目前場景累計</small></div>
+    <div><span>paint 事件數</span><strong id="paintEvents">0</strong><small>只計原生 canvas 事件</small></div>
+    <div><span>JS 繪製耗時 P95</span><strong id="drawP95">—</strong><small>不含 GPU 與 Paint 時間</small></div>
+    <div><span>頁面影格間隔 P95</span><strong id="frameP95">—</strong><small>監測上層 UI，非 GPU 負載</small></div>
+  </div>
+  <div class="detail">
+    <section class="analysis-panel"><div class="eyebrow">TECHNICAL REVIEW</div><h3>原理與投影價值</h3><p id="howText"></p><dl><dt>可減少的工作</dt><dd id="lessJS"></dd><dt>渲染成本</dt><dd id="cost"></dd><dt>適用情境</dt><dd id="fit"></dd></dl><p class="warning" id="warning"></p></section>
+    <section class="code-panel"><div class="code-head"><div><div class="eyebrow">SOURCE / API</div><h3>核心程式碼</h3></div><button id="copyCode">複製</button></div><pre><code id="code"></code></pre><div class="code-foot">實際檔案：<a href="https://github.com/ChrisTorng/ProjectionLabs/tree/main/html-in-canvas" target="_blank" rel="noopener noreferrer">html-in-canvas/</a></div></section>
+  </div>
+  <div class="capability">
+    <div class="eyebrow">RUNTIME CAPABILITIES</div>
+    <div class="cap-grid" id="capabilities"></div>
+    <p>瀏覽器能力檢測只證明介面存在；原生 draw 呼叫若拋例外會停止原生路徑、顯示錯誤並自動切換替代方案。WebGL 3D 材質紋理與原生 2D 的互動座標同步不同，請不要將視覺扭曲的紋理誤認為可直接點擊的 DOM。</p>
+  </div>
+  <footer class="foot">參考來源：<a href="https://developer.chrome.com/blog/html-in-canvas-origin-trial?hl=zh-tw" target="_blank" rel="noopener noreferrer">Chrome Origin Trial</a> · <a href="https://developer.chrome.com/blog/html-in-canvas-ot-changes?hl=zh-tw" target="_blank" rel="noopener noreferrer">新版 API 異動</a> · <a href="https://github.com/WICG/html-in-canvas" target="_blank" rel="noopener noreferrer">WICG 提案</a> · <a href="https://developer.microsoft.com/en-us/microsoft-edge/origin-trials/trials/a297467e-0030-4c4c-8739-48e130026c03" target="_blank" rel="noopener noreferrer">Edge Origin Trial</a></footer>
+</main>
+</div>
+<script type="module" src="app.js?v=20261024-1"></script>
+</body>
+</html>
