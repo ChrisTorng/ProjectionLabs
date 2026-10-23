@@ -29,26 +29,6 @@ function renderSceneList(){
     return b;
   }));
 }
-function renderCapabilities(){
-  const cap=[
-    ['Canvas 2D · drawElementImage',engine.features.twoD],
-    ['WebGL2',engine.features.webgl2],
-    ['HTML → WebGL 紋理',engine.features.htmlTexture],
-    ['captureElementImage',engine.features.snapshot],
-    ['updateElementGeometry',engine.features.geometry],
-    ['新 content 屬性',engine.features.content]
-  ];
-  $('capabilities').replaceChildren(...cap.map(([name,yes])=>{
-    const tile=document.createElement('div');tile.className='cap-tile'+(yes?'':' fail');
-    const a=document.createElement('b');a.textContent=name;
-    const b=document.createElement('span');b.textContent=yes?'✓ 可呼叫':'— 尚未提供';
-    tile.append(a,b);return tile;
-  }));
-  const available=engine.features.twoD;
-  $('supportText').textContent=available?'此瀏覽器已開啟原生 HTML-in-Canvas':'尚未啟用原生 HTML-in-Canvas';
-  $('supportDetail').textContent=available?'Canvas 2D API 可用，WebGL 依獨立偵測':'可使用 DOM 與 Canvas 2D 替代展示；啟用旗標或 Origin Trial 後重新整理';
-}
-function $(id){return document.getElementById(id)}
 function renderModeSwitch(){
   document.querySelectorAll('[data-mode]').forEach(b=>{
     const m=b.dataset.mode;
@@ -99,7 +79,7 @@ function updateStats(){
   $('paintEvents').textContent=stats.paints.toLocaleString();
   $('drawP95').textContent=stats.p95;
 }
-renderCapabilities=function(){
+function renderCapabilities(){
   const cap=[
     ['Canvas 2D · drawElementImage',engine.features.twoD],
     ['WebGL2',engine.features.webgl2],
