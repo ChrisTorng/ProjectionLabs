@@ -93,7 +93,7 @@ export class LaboratoryEngine {
     if(this.mode==='dom'){
       const layer=document.createElement('div');layer.className='fallback-layer';
       layer.innerHTML=makeMarkup(scene,text).replace('class="canvas-source','class="fallback-source');
-      if(['glass','projection','tilt'].includes(scene.id))layer.classList.add(scene.id==='tilt'?'turn':scene.id==='projection'?'zoom':'wobble');
+      if(['glass','projection','tilt','webgl'].includes(scene.id))layer.classList.add(scene.id==='tilt'?'turn':scene.id==='projection'?'zoom':'wobble');
       this.stage.append(layer,label);this.source=layer.querySelector('.fallback-source');
       this.bindInteractions();return this.mode;
     }
@@ -200,7 +200,7 @@ export class LaboratoryEngine {
         result=ctx.drawElementImage(this.source,-sw/2,-sh/2);
       }else if(this.scene.effect==='glass'){
         ctx.save();ctx.filter='blur('+(9+this.intensity*24)+'px)';
-        ctx.globalAlpha=.38;ctx.drawElementImage(this.source,x+10,y+11,{preserveElementGeometry:true});ctx.restore();
+        ctx.globalAlpha=.38;ctx.drawElementImage(this.source,x+10,y+11);ctx.restore();
         result=ctx.drawElementImage(this.source,x,y);
       }else{
         result=ctx.drawElementImage(this.source,x,y);
