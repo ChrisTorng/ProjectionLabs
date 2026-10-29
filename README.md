@@ -34,6 +34,21 @@
 
 音樂檔在本機解碼；麥克風需使用者在 HTTPS 頁面主動授權，沒有自動收音。節奏起音是估測，不等於精確的 BPM／小節辨識。音樂頁與手繪頁保留各自的使用方式；以下共用控制說明主要適用於三個分項工作台。
 
+## 動態編排與轉場實驗室（2026-10-29）
+
+入口：[動態編排與轉場](https://christorng.idv.tw/ProjectionLabs/kinetic-slides/) · 程式碼：kinetic-slides/ · 參考：[Kittenjam Motion Library](https://kittenjam-motion-library.vercel.app/)。
+
+新增 **12 個針對完整 16:9 投影片構圖的動態研究**，不修改既有 24 種轉場、48 種歌詞文字或 48 種 CSS 動態圖鑑：
+
+- 頁面轉場（6 種）：層疊卡片交接、膠卷過片、景深三層接力、棋盤格折幕、畫中抽屜、稜角光閘。
+- 文字編排（6 種）：標題滾筒、逐詞字卡、閱讀焦點軌道、雙欄編輯式換位、重點色帶接力、海報印記。
+
+每種效果提供類別／強度／技術／適用情境、效果卡片、可修改的前後投影片文字、轉場時間／速度曲線／強調色／背景、上一頁／下一頁、重播、隨機切換、自動播放、鍵盤導覽與 Fullscreen。對比原有實驗室，此頁的動畫以**卡片／文字／背景等多物件協同構圖**為核心，不只是把單一元素做 transform 或 opacity 變化。
+
+新實驗室由 kinetic-slides/index.html、style.css、effects.js、app.js 四個檔案構成，無框架、無外部套件；CSS 負責動畫，JS 負責控制、填字、觸發與匯出。**匯出離線 HTML** 會將 CSS、效果定義及控制腳本內嵌於單一檔案。原始網站完整動態清單無法由目前可用的純文字頁面逐項取得，故本實作是參照其元件／時機／情境分類方式自行設計的研究案例，**不宣稱是原網站的直接移植或逐項忠實重製**。
+
+動態偏好：遵循 prefers-reduced-motion，預設採靜態換頁；使用者可於頁面中明確切換。transform 與 opacity 為主要動作，格片、遮罩、濾鏡與陰影仍可能增加 Paint，應在預定的投影裝置測試。
+
 ## 使用方式
 
 1. 進入任一實驗室，選擇效果卡片。可依風格分類，或搜尋效果名稱、CSS 技術。
@@ -94,6 +109,7 @@ python -m http.server 8000
 ```text
 ProjectionLabs/
 ├── index.html           # 實驗室總入口
+├── kinetic-slides/       # 動態編排與多物件投影片轉場
 ├── html-in-canvas/index.html # HTML-in-Canvas 原生 API 與替代模式
 ├── new-css/index.html # 新 CSS／效能比較實驗室
 ├── composer/index.html  # 原有七層組合播放器
