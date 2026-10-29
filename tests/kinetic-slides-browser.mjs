@@ -52,8 +52,10 @@ try {
   assert.equal(await page.locator('.effect-card').count(), 6);
   await page.locator('[data-filter="全部效果"]').click();
   await page.locator('#slides').fill('台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
-  assert.match(await page.locator('#pageLabel').innerText(), /01 \/ 03/);
   await page.locator('#reduced').check();
+  // Editing should preserve the currently selected slide; navigate to page 1 explicitly.
+  for (let step = 0; step < 3 && !(await page.locator('#pageLabel').innerText()).startsWith('01 /'); step++) await page.click('#previous');
+  assert.match(await page.locator('#pageLabel').innerText(), /01 \/ 03/);
   await page.click('#next');
   assert.match(await page.locator('#pageLabel').innerText(), /02 \/ 03/);
   await page.click('#previous');
@@ -114,6 +116,11 @@ try {
       text: document.body.innerText.slice(0, 9000),
       cards: document.querySelectorAll('article, [data-motion-id]').length
     }));
+    const matches = await reference.evaluate(() => [...document.querySelectorAll('article')]
+      .map(article => article.innerText.replace(/\\s+/g, ' ').slice(0, 260))
+      .filter(text => text.includes('CSS') && /轉場切換|標題・Hero|版面・頁面|數字資訊/.test(text)));
+    info.cssCandidates = matches;
+    console.log('REFERENCE_CSS_CANDIDATES', JSON.stringify(matches.slice(0, 85)));
     await fs.writeFile(path.join(out, 'reference-inspection.json'), JSON.stringify(info, null, 2));
     await reference.screenshot({ path: path.join(out, 'reference.png'), fullPage: true });
     console.log('REFERENCE http', response.status(), 'items', info.cards, info.text.slice(0, 2000));
