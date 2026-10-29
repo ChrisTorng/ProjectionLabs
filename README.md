@@ -38,14 +38,16 @@
 
 入口：[動態編排與轉場](https://christorng.idv.tw/ProjectionLabs/kinetic-slides/) · 程式碼：kinetic-slides/ · 參考：[Kittenjam Motion Library](https://kittenjam-motion-library.vercel.app/)。
 
-新增 **18 個針對完整 16:9 投影片構圖的動態研究**，不修改既有 24 種轉場、48 種歌詞文字或 48 種 CSS 動態圖鑑：
+新增 **60 個針對完整 16:9 投影片構圖的動態研究**，不修改既有 24 種轉場、48 種歌詞文字或 48 種 CSS 動態圖鑑：
 
-- 頁面轉場（7 種）：層疊卡片交接、膠卷過片、景深三層接力、棋盤格折幕、畫中抽屜、稜角光閘、剪貼簿拼貼。
-- 文字編排（11 種）：標題滾筒、逐詞字卡、閱讀焦點軌道、雙欄編輯式換位、重點色帶接力、海報印記、雷射切斷、倒數砸落、亂碼解讀、水面倒影、詞組動態堆疊。
+- 頁面轉場（21 種）：層疊卡片交接、膠卷過片、景深三層接力、棋盤格折幕、畫中抽屜、稜角光閘、剪貼簿拼貼。
+- 文字編排（30 種）：標題滾筒、逐詞字卡、閱讀焦點軌道、雙欄編輯式換位、重點色帶接力、海報印記、雷射切斷、倒數砸落、亂碼解讀、水面倒影、詞組動態堆疊。
+
+手機版主預覽排列在參數面板之前，主舞台內提供上一／下一效果及換頁按鈕，全螢幕保留控制列；效果列表以真實 CSS 動畫縮圖呈現，使用單一共用計時器，透過 IntersectionObserver 限制到可視卡片，避免 60 張卡片同時執行動畫。支援暫停縮圖。
 
 每種效果提供類別／強度／技術／適用情境、效果卡片、可修改的前後投影片文字、轉場時間／速度曲線／強調色／背景、上一頁／下一頁、重播、隨機切換、自動播放、鍵盤導覽與 Fullscreen。對比原有實驗室，此頁的動畫以**卡片／文字／背景等多物件協同構圖**為核心，不只是把單一元素做 transform 或 opacity 變化。
 
-新實驗室由 kinetic-slides/index.html、style.css、effects.js、app.js 四個檔案構成，無框架、無外部套件；CSS 負責動畫，JS 負責控制、填字、觸發與匯出。**匯出離線 HTML** 會將 CSS、效果定義及控制腳本內嵌於單一檔案。已以 Chromium 瀏覽器讀取 Kittenjam 動態載入的 327 種項目（其中 CSS 194 種），新增 6 種明確對應原站編號的 CSS 範例：#002 Laser Cut、#008 Number Slam、#013 Scramble Decode、#017 Water Reflection、#045 Kinetic Stack、#187 Scrapbook。其餘 12 種是針對投影情境自行設計的動態。所有 CSS 均重新實作，**不是原站程式碼的直接移植**。
+新實驗室由 kinetic-slides/index.html、style.css、effects.js、app.js 四個檔案構成，無框架、無外部套件；CSS 負責動畫，JS 負責控制、填字、觸發與匯出。**匯出離線 HTML** 會將 CSS、效果定義及控制腳本內嵌於單一檔案。已以 Chromium 瀏覽器讀取 Kittenjam 動態載入的 327 種項目（其中 CSS 194 種），新增 6 種明確對應原站編號的 CSS 範例：#002 Laser Cut、#008 Number Slam、#013 Scramble Decode、#017 Water Reflection、#045 Kinetic Stack、#187 Scrapbook。另新增 42 種獨立 CSS 效果，共有 60 種。這些包含四散聚合與爆破、字元洗牌、翻牌、紙張揭幕、焦點卡片輪播、流程線、長條圖、雷達與時間軸；其他技術參照原站的視覺概念或獨立設計。所有 CSS 均重新實作，**不是原站程式碼的直接移植**。
 
 動態偏好：遵循 prefers-reduced-motion，預設採靜態換頁；使用者可於頁面中明確切換。transform 與 opacity 為主要動作，格片、遮罩、濾鏡與陰影仍可能增加 Paint，應在預定的投影裝置測試。
 
