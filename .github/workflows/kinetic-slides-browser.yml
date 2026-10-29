@@ -14,6 +14,10 @@ on:
       - '.github/workflows/kinetic-slides-browser.yml'
   workflow_dispatch:
 
+concurrency:
+  group: kinetic-slide-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
