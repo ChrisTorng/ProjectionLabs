@@ -29,7 +29,7 @@ function renderSlide(target, page, index, count) {
     const span = document.createElement('span');
     span.className = 'token';
     span.textContent = fragment;
-    span.style.setProperty('--i', sequence++);
+    span.style.setProperty('--i', Math.min(sequence++, 10));
     title.append(span);
   }
   const rule = document.createElement('span');
