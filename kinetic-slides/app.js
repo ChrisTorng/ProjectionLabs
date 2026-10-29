@@ -24,6 +24,9 @@ function renderSlide(target, page, index, count) {
   number.textContent = 'MOTION / ' + pad(index + 1);
   const title = document.createElement('h2');
   title.className = 'title';
+  // CSS pseudo-elements consume static text snapshots; no per-frame string updates.
+  title.dataset.plain = page.title;
+  title.dataset.scramble = Array.from(page.title).map(char => /\s/u.test(char) ? char : /[a-z0-9]/iu.test(char) ? '0' : '▒').join('');
   let sequence = 0;
   for (const fragment of tokens(page.title)) {
     const span = document.createElement('span');
@@ -124,6 +127,8 @@ function setEffect(id, animate = true) {
   $('effectDesc').textContent = selected.description;
   $('technique').textContent = selected.technique;
   $('usage').textContent = selected.usage;
+  $('reference').hidden = !selected.reference;
+  if (selected.reference) $('reference').textContent = 'Kittenjam 參考：' + selected.reference;
   document.querySelectorAll('.effect-card').forEach(card =>
     card.setAttribute('aria-pressed', String(card.dataset.id === selected.id)));
   if (animate) replay();
