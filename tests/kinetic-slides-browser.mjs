@@ -18,8 +18,8 @@ page.on('console', message => { if (message.type() === 'error') issues.push(mess
 try {
   const response = await page.goto(base + '/kinetic-slides/', { waitUntil: 'networkidle', timeout: 30000 });
   assert.equal(response.status(), 200, 'lab must be available over HTTP');
-  await page.waitForFunction(() => document.querySelectorAll('#effect option').length === 12);
-  assert.equal(await page.locator('.effect-card').count(), 12, 'all 12 motion cards visible');
+  await page.waitForFunction(() => document.querySelectorAll('#effect option').length === 18);
+  assert.equal(await page.locator('.effect-card').count(), 18, 'all 18 motion cards visible');
   const names = await page.locator('#effect option').allTextContents();
   console.log('Available effects:', names.join(' | '));
 
@@ -49,7 +49,7 @@ try {
   assert.equal(await page.locator('.effect-card').count(), 1);
   await page.locator('#search').fill('');
   await page.locator('[data-filter="文字編排"]').click();
-  assert.equal(await page.locator('.effect-card').count(), 6);
+  assert.equal(await page.locator('.effect-card').count(), 11);
   await page.locator('[data-filter="全部效果"]').click();
   await page.locator('#slides').fill('台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   await page.locator('#reduced').check();
