@@ -5,6 +5,33 @@ const screen = $('screen');
 const nativeReduced = matchMedia('(prefers-reduced-motion: reduce)');
 let selected = effects[0], activeIndex = 0, lastPair = null, playing = false;
 let finishTimer = 0, autoTimer = 0, filter = '全部效果';
+
+let previewPaused = false;
+let previewPage = 0;
+const previewCycle = 3600;
+const previewVisible = new Set();
+const previewTexts = [
+  {title:'光的旅程',subtitle:'從此刻出發'},
+  {title:'嶄新的一頁',subtitle:'讓畫面說話'},
+  {title:'一同向前',subtitle:'下一段故事'},
+  {title:'此刻綻放',subtitle:'用光照亮'}
+];
+const previewObserver = ('IntersectionObserver' in window)
+  ? new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const card = entry.target;
+        if (entry.isIntersecting) {
+          previewVisible.add(card);
+          ensurePreview(card);
+        } else {
+          previewVisible.delete(card);
+          card.querySelector('.mini-screen')?.classList.remove('is-playing');
+        }
+      }
+    }, {rootMargin:'120px 0px',threshold:0})
+  : null;
+let previewTimer = 0;
+
 const pad = n => String(n).padStart(2, '0');
 
 function parsePages() {
@@ -32,7 +59,13 @@ function renderSlide(target, page, index, count) {
     const span = document.createElement('span');
     span.className = 'token';
     span.textContent = fragment;
-    span.style.setProperty('--i', Math.min(sequence++, 10));
+    const n = sequence++;
+    span.style.setProperty('--i', Math.min(n, 10));
+    const orbit = n % 8;
+    const angles = [0,45,90,135,180,225,270,315];
+    span.style.setProperty('--dx', (Math.cos(angles[orbit]*Math.PI/180)*4.7).toFixed(2)+'em');
+    span.style.setProperty('--dy', (Math.sin(angles[orbit]*Math.PI/180)*3.7).toFixed(2)+'em');
+    span.style.setProperty('--angle', (n % 2 ? 135 : -125)+'deg');
     title.append(span);
   }
   const rule = document.createElement('span');
@@ -53,7 +86,19 @@ function renderSlide(target, page, index, count) {
   corner.className = 'corner-index';
   corner.textContent = pad(index + 1);
   corner.setAttribute('aria-hidden', 'true');
-  target.append(number, title, rule, subtitle, corner);
+  const visual = document.createElement('div');
+  visual.className = 'visual-layer';
+  visual.setAttribute('aria-hidden', 'true');
+  for(let i=0;i<9;i++){
+    const sh=document.createElement('i');
+    sh.className='shape';
+    sh.style.setProperty('--i',i);
+    sh.style.setProperty('--dx', ((i%3-1)*95)+'%');
+    sh.style.setProperty('--dy', ((Math.floor(i/3)-1)*95)+'%');
+    sh.dataset.day=String(i+1);
+    visual.append(sh);
+  }
+  target.append(number,title,rule,subtitle,visual,corner);
 }
 function updatePageLabel() {
   $('pageLabel').textContent = pad(activeIndex + 1) + ' / ' + pad(parsePages().length);
@@ -133,41 +178,100 @@ function setEffect(id, animate = true) {
     card.setAttribute('aria-pressed', String(card.dataset.id === selected.id)));
   if (animate) replay();
 }
+function makePreviewLayer(id, count, className, screen) {
+  const layer=document.createElement('div');
+  layer.className=className;
+  layer.setAttribute('aria-hidden','true');
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');
+    el.className=className==='tile-layer'?'tile':'blade';
+    el.style.setProperty('--i',className==='tile-layer'?i%4+Math.floor(i/4):i);
+    layer.append(el);
+  }
+  screen.append(layer);
+}
+function ensurePreview(card){
+  if(card._mini)return card._mini;
+  const mini=document.createElement('div');
+  mini.className='screen mini-screen';
+  mini.dataset.effect=card.dataset.id;
+  mini.dataset.backdrop='night';
+  mini.style.setProperty('--dur','1750ms');
+  mini.style.setProperty('--ease','cubic-bezier(.22,1,.36,1)');
+  mini.style.setProperty('--accent','#8eb4ff');
+  mini.classList.toggle('user-motion',!$('reduced').checked);
+  const from=document.createElement('div');
+  const to=document.createElement('div');
+  from.className='slide from';
+  to.className='slide to';
+  mini.append(from,to);
+  makePreviewLayer('tiles',12,'tile-layer',mini);
+  makePreviewLayer('blades',6,'blade-layer',mini);
+  const thumb=card.querySelector('.thumb');
+  thumb.replaceChildren(mini);
+  card._mini={screen:mini,from,to};
+  const page=previewTexts[previewPage%previewTexts.length];
+  renderSlide(from,page,previewPage%previewTexts.length,previewTexts.length);
+  renderSlide(to,previewTexts[(previewPage+1)%previewTexts.length],(previewPage+1)%previewTexts.length,previewTexts.length);
+  return card._mini;
+}
+function advancePreviews(){
+  if(previewPaused||$('reduced').checked||document.hidden) return;
+  previewPage=(previewPage+1)%previewTexts.length;
+  const cards=[...previewVisible].filter(card=>card.isConnected);
+  for(const card of cards){
+    const mini=ensurePreview(card);
+    mini.screen.classList.remove('is-playing');
+    renderSlide(mini.from,previewTexts[(previewPage+previewTexts.length-1)%previewTexts.length],(previewPage+previewTexts.length-1)%previewTexts.length,previewTexts.length);
+    renderSlide(mini.to,previewTexts[previewPage],previewPage,previewTexts.length);
+  }
+  // One shared timestamp starts all visible animations simultaneously.
+  requestAnimationFrame(()=>{if(!previewPaused&&!$('reduced').checked)for(const card of cards)card._mini?.screen.classList.add('is-playing');});
+  $('previewStatus').textContent='同步第 '+(previewPage+1)+' / '+previewTexts.length+' 頁';
+}
 function renderCards() {
-  const keyword = $('search').value.trim().toLowerCase();
-  const matches = effects.filter(effect =>
-    (filter === '全部效果' || effect.category === filter)
-    && [effect.name, effect.category, effect.technique, effect.description, effect.usage]
+  const keyword=$('search').value.trim().toLowerCase();
+  const matches=effects.filter(effect=>
+    (filter==='全部效果'||effect.category===filter)
+    && [effect.name,effect.category,effect.technique,effect.description,effect.usage,effect.reference||'']
       .join(' ').toLowerCase().includes(keyword));
+  previewObserver?.disconnect();
+  previewVisible.clear();
   $('cards').replaceChildren();
-  matches.forEach(effect => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'effect-card';
-    b.dataset.id = effect.id;
-    b.setAttribute('aria-pressed', String(effect.id === selected.id));
-    const head = document.createElement('div');
-    const thumb = document.createElement('span');
-    thumb.className = 'thumb';
-    thumb.setAttribute('aria-hidden', 'true');
-    for (let j = 0; j < 3; j++) thumb.append(document.createElement('i'));
-    const detail = document.createElement('div');
-    const title = document.createElement('b');
-    title.textContent = effect.name;
-    const sub = document.createElement('small');
-    sub.textContent = effect.category + ' · ' + effect.level;
-    const desc = document.createElement('p');
-    desc.textContent = effect.description;
-    detail.append(title, sub, desc);
-    b.append(thumb, detail);
-    b.addEventListener('click', () => {
+  for(const effect of matches){
+    const card=document.createElement('button');
+    card.type='button';
+    card.className='effect-card';
+    card.dataset.id=effect.id;
+    card.setAttribute('aria-pressed',String(effect.id===selected.id));
+    card.setAttribute('aria-label','以完整投影片預覽 '+effect.name);
+    const thumb=document.createElement('span');
+    thumb.className='thumb';
+    thumb.setAttribute('aria-hidden','true');
+    const detail=document.createElement('div');
+    detail.className='card-detail';
+    const name=document.createElement('b');
+    name.textContent=effect.name;
+    const sub=document.createElement('small');
+    sub.textContent=effect.category+' · '+effect.level;
+    const desc=document.createElement('p');
+    desc.textContent=effect.description;
+    detail.append(name,sub,desc);
+    card.append(thumb,detail);
+    card.addEventListener('click',()=>{
       setEffect(effect.id);
-      document.querySelector('.viewer').scrollIntoView({ block: 'start', behavior: $('reduced').checked ? 'instant' : 'smooth' });
+      document.querySelector('.viewer').scrollIntoView({block:'start',behavior:$('reduced').checked?'instant':'smooth'});
     });
-    $('cards').append(b);
-  });
-  $('resultCount').textContent = matches.length + ' / ' + effects.length + ' 種';
-  $('empty').hidden = matches.length !== 0;
+    $('cards').append(card);
+    if(previewObserver)previewObserver.observe(card);
+    else{previewVisible.add(card);ensurePreview(card);}
+  }
+  $('resultCount').textContent=matches.length+' / '+effects.length+' 種';
+  $('empty').hidden=matches.length!==0;
+}
+function selectAdjacentEffect(delta){
+  const index=effects.findIndex(effect=>effect.id===selected.id);
+  setEffect(effects[(index+delta+effects.length)%effects.length].id);
 }
 function updateSettings() {
   const duration = +$('duration').value;
@@ -266,8 +370,24 @@ function init() {
   $('effect').addEventListener('change', () => setEffect($('effect').value));
   $('slides').addEventListener('input', () => { cancelPlayback(); lastPair = null; staticScene(); updateStatus('已更新投影片文字'); planAuto(); });
   ['duration', 'accent', 'easing', 'backdrop'].forEach(id => $(id).addEventListener('input', updateSettings));
-  $('reduced').addEventListener('change', () => { updateSettings(); cancelPlayback(); staticScene(); updateStatus('已更新動態設定'); planAuto(); });
+  $('reduced').addEventListener('change', () => { updateSettings(); for(const card of previewVisible) {card._mini?.screen.classList.toggle('user-motion',!$('reduced').checked); if($('reduced').checked) card._mini?.screen.classList.remove('is-playing'); } cancelPlayback(); staticScene(); updateStatus('已更新動態設定'); if(!$('reduced').checked)advancePreviews(); planAuto(); });
   $('auto').addEventListener('change', planAuto);
+  $('effectPrevious').addEventListener('click', () => selectAdjacentEffect(-1));
+  $('effectNext').addEventListener('click', () => selectAdjacentEffect(1));
+  $('previousEffect').addEventListener('click', () => selectAdjacentEffect(-1));
+  $('nextEffect').addEventListener('click', () => selectAdjacentEffect(1));
+  $('stagePrevious').addEventListener('click', () => playTo(activeIndex - 1));
+  $('stageNext').addEventListener('click', () => playTo(activeIndex + 1));
+  $('stageFullscreen').addEventListener('click', () => $('fullscreen').click());
+  $('previewToggle').addEventListener('click', () => {
+    previewPaused=!previewPaused;
+    $('previewToggle').textContent=previewPaused?'播放縮圖':'暫停縮圖';
+    $('previewToggle').setAttribute('aria-pressed', String(previewPaused));
+    $('previewStatus').textContent=previewPaused?'預覽已暫停':'同步自動預覽中';
+    if(previewPaused)for(const card of previewVisible)card._mini?.screen.classList.remove('is-playing');
+    else advancePreviews();
+  });
+  if(!previewTimer)previewTimer=setInterval(advancePreviews,previewCycle);
   $('previous').addEventListener('click', () => playTo(activeIndex - 1));
   $('next').addEventListener('click', () => playTo(activeIndex + 1));
   $('replay').addEventListener('click', replay);
@@ -287,6 +407,8 @@ function init() {
   document.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+    if (event.key === 'ArrowUp') {event.preventDefault();selectAdjacentEffect(-1);}
+    if (event.key === 'ArrowDown') {event.preventDefault();selectAdjacentEffect(1);}
     if (event.key === 'ArrowRight') { event.preventDefault(); playTo(activeIndex + 1); }
     if (event.key === 'ArrowLeft') { event.preventDefault(); playTo(activeIndex - 1); }
     if (event.code === 'Space') { event.preventDefault(); replay(); }
