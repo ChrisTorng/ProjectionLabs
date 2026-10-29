@@ -204,7 +204,8 @@ async function exportOffline() {
       accent: $('accent').value,
       easing: $('easing').value,
       backdrop: $('backdrop').value,
-      reduced: $('reduced').checked
+      reduced: $('reduced').checked,
+      activeIndex
     };
     const bootstrap = document.createElement('script');
     bootstrap.textContent = 'window.__kineticDefaults = ' + JSON.stringify(defaults).replace(/</g, '\\u003c') + ';';
@@ -238,6 +239,7 @@ function init() {
     $('easing').value = defaults.easing;
     $('backdrop').value = defaults.backdrop;
   }
+  if (defaults && Number.isInteger(defaults.activeIndex) && defaults.activeIndex >= 0) activeIndex = defaults.activeIndex;
   $('reduced').checked = defaults ? !!defaults.reduced : nativeReduced.matches;
   $('total').textContent = effects.length;
   // Exported offline HTML contains the rendered DOM; initialize from a clean state.
