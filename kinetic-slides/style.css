@@ -109,7 +109,7 @@ header{max-width:1440px;margin:auto;padding:16px clamp(16px,3vw,40px);display:fl
 .screen.is-playing[data-effect="water-reflection"] .from{animation:old-fade var(--dur) var(--ease) both}
 .screen.is-playing[data-effect="water-reflection"] .to{animation:new-fade var(--dur) var(--ease) both}
 .screen[data-effect="water-reflection"] .title{position:relative;overflow:visible;margin-bottom:.38em}
-.screen[data-effect="water-reflection"] .to .title::after{
+.screen[data-effect="water-reflection"] .slide .title::after{
   content:attr(data-plain);position:absolute;left:0;top:90%;width:100%;
   color:var(--accent);opacity:.21;font:inherit;line-height:inherit;letter-spacing:inherit;
   white-space:pre-wrap;transform-origin:50% 0;transform:scaleY(-.6) skewX(4deg);
