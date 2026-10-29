@@ -46,3 +46,117 @@ header{max-width:1440px;margin:auto;padding:16px clamp(16px,3vw,40px);display:fl
 .screen:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0}.screen:fullscreen .slide{inset:11% 10%}.screen:fullscreen .slide .title{font-size:clamp(30px,5.2vw,110px)}.screen:fullscreen .slide .subtitle{font-size:clamp(15px,2.2vw,35px)}
 @media(max-width:900px){.workspace{grid-template-columns:1fr}.controls{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.controls .eyebrow,.controls h2,.controls .wide{grid-column:1/-1}.slide{inset:10% 8%}}@media(max-width:600px){.intro{align-items:start}.count{display:none}.controls{display:block}.controls>*{margin-bottom:10px}.screen .topline,.screen .bottomline{font-size:7px}.screen .slide{inset:12% 6%;padding:9px;gap:3px}.screen .slide .number{font-size:7px}.screen .slide .number::before{width:9px}.screen .slide .title{font-size:clamp(15px,4.4vw,28px)}.screen .slide .subtitle{font-size:clamp(8px,2vw,14px)}.screen .slide .corner-index{font-size:20px}.catalog-head{display:block}.viewer{padding:10px}.transport .status{width:100%;margin:0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.screen:not(.user-motion) *{animation:none!important;transition:none!important}.screen:not(.user-motion) .from{opacity:1!important;transform:none!important}.screen:not(.user-motion) .to,.screen:not(.user-motion) .tile-layer,.screen:not(.user-motion) .blade-layer{display:none!important}.screen:not(.user-motion).is-playing .to{opacity:1!important;display:grid!important}.screen:not(.user-motion).is-playing .from{opacity:0!important}}
+
+
+/* Kittenjam CSS references: #002, #008, #013, #017, #045, #187.
+   These are independently implemented motion studies, not upstream source copies. */
+.screen.is-playing[data-effect="laser-cut"] .from{animation:old-fade var(--dur) steps(1,end) both}
+.screen.is-playing[data-effect="laser-cut"] .to{animation:new-fade var(--dur) var(--ease) both}
+.screen[data-effect="laser-cut"] .title{position:relative;overflow:visible}
+.screen.is-playing[data-effect="laser-cut"] .from .title .token{opacity:0}
+.screen.is-playing[data-effect="laser-cut"] .from .title::before,
+.screen.is-playing[data-effect="laser-cut"] .from .title::after{
+  content:attr(data-plain);position:absolute;inset:0;color:#fff;
+  font:inherit;line-height:inherit;letter-spacing:inherit;white-space:pre-wrap;
+  overflow:hidden;pointer-events:none;filter:drop-shadow(0 0 5px #91c9ff77);
+}
+.screen.is-playing[data-effect="laser-cut"] .from .title::before{
+  clip-path:inset(0 0 50% 0);animation:laser-upper var(--dur) var(--ease) both;
+}
+.screen.is-playing[data-effect="laser-cut"] .from .title::after{
+  clip-path:inset(50% 0 0 0);animation:laser-lower var(--dur) var(--ease) both;
+}
+.screen.is-playing[data-effect="laser-cut"] .from .rule{
+  position:absolute;z-index:5;top:48%;left:7%;width:86%;height:3px;
+  box-shadow:0 0 8px 2px #b5e2ff,0 0 22px 5px #74b8ff;
+  animation:laser-beam var(--dur) linear both;
+}
+@keyframes laser-upper{0%,30%{opacity:1;transform:none}60%,100%{opacity:0;transform:translate(-9%,-32%) rotate(-3deg)}}
+@keyframes laser-lower{0%,30%{opacity:1;transform:none}60%,100%{opacity:0;transform:translate(9%,34%) rotate(3deg)}}
+@keyframes laser-beam{0%,21%{opacity:0;transform:scaleX(0);transform-origin:left}28%,43%{opacity:1;transform:scaleX(1);transform-origin:left}59%,100%{opacity:0;transform:scaleX(1)}}
+
+.screen.is-playing[data-effect="number-slam"] .from{animation:old-fade var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="number-slam"] .to{animation:new-fade var(--dur) var(--ease) both}
+.screen[data-effect="number-slam"] .to .corner-index{
+  top:10%;right:10%;bottom:auto;font-size:clamp(46px,14vw,210px);
+  line-height:1;color:#c5e0ff7d;text-shadow:0 8px 18px #030a174d;z-index:0;
+}
+.screen.is-playing[data-effect="number-slam"] .to .corner-index{
+  animation:number-hit var(--dur) cubic-bezier(.12,1.2,.4,1) both;
+}
+.screen.is-playing[data-effect="number-slam"] .to .rule{
+  transform-origin:left;animation:number-shock var(--dur) ease-out both;
+}
+@keyframes number-hit{0%,14%{opacity:0;transform:translateY(-115%) scale(3.2) rotate(-13deg)}46%{opacity:1;transform:translateY(9%) scale(.88) rotate(4deg)}62%{opacity:1;transform:translateY(-3%) scale(1.06)}84%,100%{opacity:1;transform:none}}
+@keyframes number-shock{0%,38%{opacity:0;transform:scaleX(0)}47%{opacity:1;transform:scaleX(1.7)}80%,100%{opacity:.8;transform:scaleX(1)}}
+
+.screen.is-playing[data-effect="scramble-decode"] .from{animation:old-fade var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="scramble-decode"] .to{animation:new-fade var(--dur) var(--ease) both}
+.screen[data-effect="scramble-decode"] .title{position:relative;overflow:visible}
+.screen.is-playing[data-effect="scramble-decode"] .to .title .token{
+  animation:decode-clean calc(var(--dur) * .85) steps(8,end) both;
+  animation-delay:calc(var(--i) * 24ms);
+}
+.screen.is-playing[data-effect="scramble-decode"] .to .title::before{
+  content:attr(data-scramble);white-space:pre-wrap;position:absolute;inset:0;
+  color:var(--accent);font:inherit;letter-spacing:inherit;line-height:inherit;
+  text-shadow:3px 0 #d5fdff50;pointer-events:none;
+  animation:decode-noise var(--dur) steps(9,end) both;
+}
+@keyframes decode-noise{0%,23%{opacity:.6;transform:translateX(1%);clip-path:inset(0 0 0 0)}35%{opacity:.95;transform:translateX(-1%)}65%{opacity:.1;clip-path:inset(0 82% 0 0)}76%,100%{opacity:0;clip-path:inset(0 100% 0 0)}}
+@keyframes decode-clean{0%,23%{opacity:0;clip-path:inset(0 100% 0 0)}50%{opacity:.8;clip-path:inset(0 35% 0 0)}78%,100%{opacity:1;clip-path:inset(0)}}
+
+.screen.is-playing[data-effect="water-reflection"] .from{animation:old-fade var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="water-reflection"] .to{animation:new-fade var(--dur) var(--ease) both}
+.screen[data-effect="water-reflection"] .title{position:relative;overflow:visible;margin-bottom:.38em}
+.screen[data-effect="water-reflection"] .to .title::after{
+  content:attr(data-plain);position:absolute;left:0;top:90%;width:100%;
+  color:var(--accent);opacity:.21;font:inherit;line-height:inherit;letter-spacing:inherit;
+  white-space:pre-wrap;transform-origin:50% 0;transform:scaleY(-.6) skewX(4deg);
+  mask-image:linear-gradient(#0007,transparent 85%);filter:blur(1.5px);
+  pointer-events:none;animation:water-undulate 2.8s ease-in-out infinite alternate;
+}
+.screen.is-playing[data-effect="water-reflection"] .to .title::after{
+  animation:water-appear var(--dur) var(--ease) both;
+}
+@keyframes water-appear{0%,34%{opacity:0;transform:scaleY(-.5) skewX(18deg) translateX(6%)}67%,100%{opacity:.24;transform:scaleY(-.6) skewX(4deg)}}
+@keyframes water-undulate{from{transform:scaleY(-.6) skewX(4deg)}to{transform:scaleY(-.63) skewX(-4deg)}}
+
+.screen.is-playing[data-effect="kinetic-stack"] .from{animation:old-fade var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="kinetic-stack"] .to{animation:new-fade var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="kinetic-stack"] .to .title .token{
+  animation:stack-word calc(var(--dur) * .78) var(--ease) both;
+  animation-delay:calc(var(--i) * 18ms);
+}
+@keyframes stack-word{0%,24%{opacity:0;transform:translateX(calc(var(--i) * -.65em)) translateY(-.45em) rotate(-14deg) scale(1.15)}52%{opacity:1;transform:translateY(.1em) rotate(2deg) scale(.96)}80%,100%{opacity:1;transform:none}}
+
+.screen[data-effect="scrapbook"] .slide{
+  background:linear-gradient(145deg,#2e3e59 0%,#162943 60%,#1e263a);
+  box-shadow:0 18px 36px #0005;
+}
+.screen[data-effect="scrapbook"] .slide::before{
+  content:'';position:absolute;z-index:0;top:12%;right:7%;width:29%;height:55%;
+  border:clamp(5px,1vw,14px) solid #eff1e7;
+  border-bottom-width:clamp(17px,3vw,44px);border-radius:3px;
+  background:radial-gradient(circle at 72% 22%,#f9c373 0 8%,transparent 9%),linear-gradient(155deg,#5b92b0 0%,#9ec4c2 44%,#35566b 44% 60%,#203651 60%);
+  box-shadow:0 12px 25px #0008;transform:rotate(8deg);opacity:.85;
+}
+.screen[data-effect="scrapbook"] .slide::after{
+  content:'';position:absolute;z-index:2;top:9%;right:12%;width:20%;height:8%;
+  background:#f4e3a58c;box-shadow:0 1px 2px #0004;transform:rotate(-12deg);
+}
+.screen[data-effect="scrapbook"] .slide .title{max-width:72%;position:relative;z-index:3;font-size:clamp(18px,3.35vw,51px)}
+.screen[data-effect="scrapbook"] .slide .subtitle{max-width:68%;position:relative;z-index:3}
+.screen.is-playing[data-effect="scrapbook"] .from{animation:old-fade var(--dur) ease-in-out both}
+.screen.is-playing[data-effect="scrapbook"] .to{animation:scrap-page var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="scrapbook"] .to::before{animation:scrap-photo var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="scrapbook"] .to::after{animation:scrap-tape var(--dur) var(--ease) both}
+.screen.is-playing[data-effect="scrapbook"] .to .title{animation:scrap-title var(--dur) var(--ease) both}
+@keyframes scrap-page{0%,24%{opacity:0;transform:translateY(19%) rotate(-7deg) scale(.85)}60%,100%{opacity:1;transform:none}}
+@keyframes scrap-photo{0%,24%{opacity:0;transform:translate(32%,-55%) rotate(30deg) scale(1.4)}65%,100%{opacity:.85;transform:rotate(8deg)}}
+@keyframes scrap-tape{0%,40%{opacity:0;transform:translateY(-65%) rotate(20deg)}78%,100%{opacity:1;transform:rotate(-12deg)}}
+@keyframes scrap-title{0%,30%{opacity:0;transform:translate(-14%,16%) rotate(-10deg)}72%,100%{opacity:1;transform:none}}
+@media(max-width:600px){
+  .screen[data-effect="scrapbook"] .slide .title{font-size:clamp(13px,3.6vw,24px)}
+  .screen[data-effect="number-slam"] .to .corner-index{font-size:48px}
+}
