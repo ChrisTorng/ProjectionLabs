@@ -25,7 +25,7 @@ try {
 
   // Standard motion tests are deterministic regardless of runner's OS preference.
   await page.locator('#reduced').uncheck();
-  await page.locator('#duration').fill('900');
+  await page.locator('#duration').evaluate(el => { el.value = '900'; el.dispatchEvent(new Event('input', { bubbles: true })); });
   for (const effect of await page.locator('#effect option').evaluateAll(list => list.map(node => node.value))) {
     await page.selectOption('#effect', effect);
     await page.click('#replay');
