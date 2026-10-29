@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="ProjectionLabs 動態編排實驗室：18 種適合投影的卡片、膠卷、景深與文字編排動態，16:9 舞台、參數調整、可離線匯出。">
+  <meta name="description" content="ProjectionLabs 動態編排實驗室：60 種適合投影的卡片、膠卷、景深與文字編排動態，16:9 舞台、參數調整、可離線匯出。">
   <title>動態編排與轉場｜ProjectionLabs</title>
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
@@ -20,7 +20,7 @@
       <h1>讓換頁不只是切換，<br><span>而是內容的編排。</span></h1>
       <p>從 Motion Library 的收藏方式出發，專注既有 ProjectionLabs 少見的多層轉場、物件交接與文字隊列。所有動畫由原生 CSS 重製，JavaScript 僅負責換頁與控制。</p>
     </div>
-    <div class="count"><strong id="total">18</strong><span>種動態研究</span></div>
+    <div class="count"><strong id="total">60</strong><span>種動態研究</span></div>
   </section>
   <div class="workspace">
     <aside class="controls" aria-label="動態參數">
@@ -44,11 +44,11 @@
       <div class="wide"><label for="backdrop">背景氛圍</label><select id="backdrop"><option value="night">冷色光場</option><option value="warm">暖色舞台</option><option value="plain">素色深藍</option></select></div>
       <label class="check wide"><input id="reduced" type="checkbox"> 減少動態（直接切換畫面）</label>
       <label class="check wide"><input id="auto" type="checkbox"> 自動播放（轉場後停留 3 秒）</label>
-      <small class="wide">效果類型與既有的單一文字、淡入、推頁、百葉窗及翻面效果分開選取；高成本效果只在手動預覽或播放時運作。</small>
+      <small class="wide">效果類型與既有的單一文字、淡入、推頁、百葉窗及翻面效果分開選取；縮圖僅在可視區附近播放，並共用一個時間基準。</small>
     </aside>
     <section class="viewer" aria-labelledby="viewerTitle">
       <div class="section-top">
-        <div><p class="eyebrow">02 / LIVE PREVIEW</p><h2 id="viewerTitle">16:9 即時投影</h2></div>
+        <div><p class="eyebrow">02 / LIVE PREVIEW</p><h2 id="viewerTitle">16:9 即時投影 · 畫面內切換效果</h2></div>
         <div class="button-row"><button id="fullscreen" type="button" class="btn small">全螢幕</button><button id="replay" type="button" class="btn small">重播轉場</button></div>
       </div>
       <div id="screen" class="screen" data-effect="stack-deck" data-backdrop="night" tabindex="0" role="group" aria-label="投影片動畫舞台">
@@ -58,9 +58,14 @@
         <div class="tile-layer" id="tiles" aria-hidden="true"></div>
         <div class="blade-layer" id="blades" aria-hidden="true"></div>
         <div class="bottomline"><span id="pageLabel">01 / 04</span><span id="effectLabel">層疊卡片交接</span></div>
+        <div class="stage-transport" aria-label="舞台快速操作">
+          <div class="stage-group stage-effects"><button type="button" id="effectPrevious" aria-label="上一個效果">◀ 效果</button><button type="button" id="effectNext" aria-label="下一個效果">效果 ▶</button></div>
+          <div class="stage-group stage-pages"><button type="button" id="stagePrevious" aria-label="上一頁">◀ 頁</button><button type="button" id="stageNext" aria-label="下一頁">頁 ▶</button></div>
+          <button type="button" id="stageFullscreen" class="stage-fullscreen" aria-label="切換全螢幕">⛶</button>
+        </div>
       </div>
       <div class="transport">
-        <button id="previous" type="button" class="btn">← 上一頁</button>
+        <button id="previousEffect" type="button" class="btn">← 上個效果</button><button id="nextEffect" type="button" class="btn primary">下個效果 →</button><button id="previous" type="button" class="btn">← 上一頁</button>
         <button id="next" type="button" class="btn primary">下一頁 →</button>
         <button id="random" type="button" class="btn">隨機效果</button>
         <span id="status" class="status" role="status" aria-live="polite">準備播放</span>
@@ -71,17 +76,18 @@
         <p>核心技術：<span id="technique"></span>　適合：<span id="usage"></span></p>
         <p><a id="reference" href="https://kittenjam-motion-library.vercel.app/" target="_blank" rel="noreferrer" hidden></a></p>
       </div>
-      <div class="viewer-footer"><span class="meta">← → 換頁 · 空白鍵重播 · F 全螢幕 · Esc 離開；輸入文字時不攔截</span><button id="download" type="button" class="btn">匯出離線 HTML</button></div>
+      <div class="viewer-footer"><span class="meta">畫面內可直接切換效果與換頁，全螢幕同樣適用。← → 換頁 · ↑ ↓ 換效果 · 空白鍵重播 · F 全螢幕</span><button id="download" type="button" class="btn">匯出離線 HTML</button></div>
     </section>
   </div>
   <section class="catalog" id="catalog">
-    <div class="catalog-head"><div><p class="eyebrow">03 / MOTION STUDIES</p><h2>完整構圖，而非孤立動畫。</h2></div><span id="resultCount">18 / 18</span></div>
-    <div class="filters"><input type="search" id="search" placeholder="搜尋效果、技術、應用…" aria-label="搜尋效果"><button class="btn small" type="button" data-filter="全部效果" aria-pressed="true">全部效果</button><button class="btn small" type="button" data-filter="頁面轉場" aria-pressed="false">頁面轉場</button><button class="btn small" type="button" data-filter="文字編排" aria-pressed="false">文字編排</button></div>
+    <div class="catalog-head"><div><p class="eyebrow">03 / MOTION STUDIES</p><h2>完整構圖，而非孤立動畫。</h2></div><span id="resultCount">60 / 60</span></div>
+    <div class="catalog-preview-tools"><span>所有縮圖同步自動換頁 · 滾動直接比較，點選看完整動畫</span><button id="previewToggle" type="button" class="btn small" aria-pressed="false">暫停縮圖</button><span id="previewStatus">自動預覽中</span></div>
+    <div class="filters"><input type="search" id="search" placeholder="搜尋效果、技術、應用…" aria-label="搜尋效果"><button class="btn small" type="button" data-filter="全部效果" aria-pressed="true">全部效果</button><button class="btn small" type="button" data-filter="頁面轉場" aria-pressed="false">頁面轉場</button><button class="btn small" type="button" data-filter="文字編排" aria-pressed="false">文字編排</button><button class="btn small" type="button" data-filter="資訊動態" aria-pressed="false">資訊動態</button></div>
     <div id="cards" class="effect-grid"></div>
     <p id="empty" hidden>沒有相符效果，請調整搜尋或分類。</p>
   </section>
   <section class="about" id="sources"><p class="eyebrow">REFERENCE / IMPLEMENTATION</p><h2>來源與技術界線</h2>
-    <p>參考 <a href="https://kittenjam-motion-library.vercel.app/" target="_blank" rel="noreferrer">Kittenjam Motion Library</a> 的元件／動作時機／情境收藏概念，並以 <a href="../transitions/">既有轉場</a>、<a href="../lyrics/">文字效果</a>、<a href="../motion-atlas/">動態圖鑑</a> 排除同質項目。目前已透過實際瀏覽器確認原站 CSS 動畫類別與具體項目，其中 6 種有明確標示原站編號；另外 12 種為針對投影情境自行設計的動態。所有 CSS 均為本專案重新實作，不直接複製原站程式。</p>
+    <p>參考 <a href="https://kittenjam-motion-library.vercel.app/" target="_blank" rel="noreferrer">Kittenjam Motion Library</a> 的元件／動作時機／情境收藏概念，並以 <a href="../transitions/">既有轉場</a>、<a href="../lyrics/">文字效果</a>、<a href="../motion-atlas/">動態圖鑑</a> 排除同質項目。目前已透過實際瀏覽器確認原站 CSS 動畫類別與具體項目，其中一部分有明確標示原站編號，其餘為針對投影情境自行設計的動態。所有 CSS 均為本專案重新實作，不直接複製原站程式。</p>
     <p>動畫以 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations" target="_blank" rel="noreferrer">CSS Animations</a>、<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform" target="_blank" rel="noreferrer">transform</a>、<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path" target="_blank" rel="noreferrer">clip-path</a> 實作。大部分換位由合成層處理；格片、陰影、裁切仍可能增加 Paint。開啟「減少動態」可直接切頁。沒有外部動畫套件或網路 API。</p>
   </section>
   <footer><span>ProjectionLabs / Kinetic Slides</span><a href="../">返回實驗室首頁</a></footer>
