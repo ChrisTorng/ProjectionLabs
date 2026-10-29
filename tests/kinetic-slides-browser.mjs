@@ -83,6 +83,7 @@ try {
   await offline.waitForFunction(() => document.querySelectorAll('#effect option').length === 18, { timeout: 10000 });
   assert.equal(await offline.locator('#slides').inputValue(), '台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   assert.equal(await offline.locator('#effect').inputValue(), await page.locator('#effect').inputValue());
+  assert.equal(await offline.locator('#pageLabel').innerText(), await page.locator('#pageLabel').innerText(), 'export must retain current slide');
   await offline.locator('#next').click();
   assert.match(await offline.locator('#pageLabel').innerText(), /03 \/ 03/);
   await offline.screenshot({ path: path.join(out, 'offline.png'), fullPage: true });
