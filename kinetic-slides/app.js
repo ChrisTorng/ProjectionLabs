@@ -24,6 +24,9 @@ function renderSlide(target, page, index, count) {
   number.textContent = 'MOTION / ' + pad(index + 1);
   const title = document.createElement('h2');
   title.className = 'title';
+  // CSS pseudo-elements consume static text snapshots; no per-frame string updates.
+  title.dataset.plain = page.title;
+  title.dataset.scramble = Array.from(page.title).map(char => /\s/u.test(char) ? char : /[a-z0-9]/iu.test(char) ? '0' : '▒').join('');
   let sequence = 0;
   for (const fragment of tokens(page.title)) {
     const span = document.createElement('span');
@@ -124,6 +127,8 @@ function setEffect(id, animate = true) {
   $('effectDesc').textContent = selected.description;
   $('technique').textContent = selected.technique;
   $('usage').textContent = selected.usage;
+  $('reference').hidden = !selected.reference;
+  if (selected.reference) $('reference').textContent = 'Kittenjam 參考：' + selected.reference;
   document.querySelectorAll('.effect-card').forEach(card =>
     card.setAttribute('aria-pressed', String(card.dataset.id === selected.id)));
   if (animate) replay();
@@ -187,7 +192,7 @@ async function exportOffline() {
       '\n' + appJs.replace(/^import\s*\{\s*effects\s*\}\s*from\s*['"]\.\/effects\.js['"];\s*/m, '');
     const clone = document.documentElement.cloneNode(true);
     clone.querySelector('textarea#slides').textContent = $('slides').value;
-    clone.querySelectorAll('link[rel="stylesheet"]').forEach(link => link.remove());
+    clone.querySelectorAll('link[rel="stylesheet"], link[rel="icon"]').forEach(link => link.remove());
     const style = document.createElement('style');
     style.textContent = css;
     clone.querySelector('head').append(style);
@@ -199,7 +204,8 @@ async function exportOffline() {
       accent: $('accent').value,
       easing: $('easing').value,
       backdrop: $('backdrop').value,
-      reduced: $('reduced').checked
+      reduced: $('reduced').checked,
+      activeIndex
     };
     const bootstrap = document.createElement('script');
     bootstrap.textContent = 'window.__kineticDefaults = ' + JSON.stringify(defaults).replace(/</g, '\\u003c') + ';';
@@ -233,8 +239,13 @@ function init() {
     $('easing').value = defaults.easing;
     $('backdrop').value = defaults.backdrop;
   }
+  if (defaults && Number.isInteger(defaults.activeIndex) && defaults.activeIndex >= 0) activeIndex = defaults.activeIndex;
   $('reduced').checked = defaults ? !!defaults.reduced : nativeReduced.matches;
   $('total').textContent = effects.length;
+  // Exported offline HTML contains the rendered DOM; initialize from a clean state.
+  $('effect').replaceChildren();
+  $('tiles').replaceChildren();
+  $('blades').replaceChildren();
   effects.forEach(effect => $('effect').add(new Option(effect.name + ' / ' + effect.category, effect.id)));
   for (let i = 0; i < 12; i++) {
     const tile = document.createElement('div');

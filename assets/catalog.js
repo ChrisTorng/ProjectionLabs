@@ -6,7 +6,7 @@ export const labs = [
   { id: 'composer', title: '效果組合室', subtitle: '七層效果、三頁接力與完整播放器匯出', color: '#7de4cd' },
   { id: 'html-in-canvas', title: 'HTML-in-Canvas 原生實驗室', subtitle: '7 個場景：Canvas 2D / WebGL 與原生 DOM 混合渲染', color: '#99caff' },
   { id: 'new-css', title: '新世代 CSS 技術實驗室', subtitle: '17 個實例：最新 CSS、JS 簡化與效能比較', color: '#80f4cf' },
-  { id: 'kinetic-slides', title: '動態編排與轉場', subtitle: '12 種卡片、膠卷、景深與文字編排的完整投影片動態', color: '#8eb4ff', description: '多層畫面與文字構圖；16:9 即時比較、轉場參數調整及離線 HTML 匯出。' },
+  { id: 'kinetic-slides', title: '動態編排與轉場', subtitle: '18 種卡片、膠卷、景深與文字編排的完整投影片動態', color: '#8eb4ff', description: '多層畫面與文字構圖；16:9 即時比較、轉場參數調整及離線 HTML 匯出。' },
   { id: 'motion-atlas', title: 'Web Motion Atlas', subtitle: '48 種單效果圖鑑、時間軸與獨立 HTML', color: '#8baaff' },
   { id: 'music-motion', title: '音樂動態', subtitle: '聲音、頻段與節奏驅動的圖層組合', color: '#ffc078' },
   { id: 'ink-song', title: '詩歌手繪', subtitle: '隨拍逐筆繪製、累積與擦除', color: '#b9cd9e' },
