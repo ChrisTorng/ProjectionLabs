@@ -44,7 +44,7 @@
       <div class="wide"><label for="backdrop">背景氛圍</label><select id="backdrop"><option value="night">冷色光場</option><option value="warm">暖色舞台</option><option value="plain">素色深藍</option></select></div>
       <label class="check wide"><input id="reduced" type="checkbox"> 減少動態（直接切換畫面）</label>
       <label class="check wide"><input id="auto" type="checkbox"> 自動播放（轉場後停留 3 秒）</label>
-      <small class="wide">效果類型與既有的單一文字、淡入、推頁、百葉窗及翻面效果分開選取；縮圖僅在可視區附近播放，並共用一個時間基準。</small>
+      <small class="wide">效果類型與既有的淡入、推頁、百葉窗及翻面效果分開選取；縮圖僅在可視區附近播放，並共用一個時間基準。</small>
     </aside>
     <section class="viewer" aria-labelledby="viewerTitle">
       <div class="section-top">
@@ -87,7 +87,7 @@
     <p id="empty" hidden>沒有相符效果，請調整搜尋或分類。</p>
   </section>
   <section class="about" id="sources"><p class="eyebrow">REFERENCE / IMPLEMENTATION</p><h2>來源與技術界線</h2>
-    <p>參考 <a href="https://kittenjam-motion-library.vercel.app/" target="_blank" rel="noreferrer">Kittenjam Motion Library</a> 的元件／動作時機／情境收藏概念，並以 <a href="../transitions/">既有轉場</a>、<a href="../lyrics/">文字效果</a>、<a href="../motion-atlas/">動態圖鑑</a> 排除同質項目。目前已透過實際瀏覽器確認原站 CSS 動畫類別與具體項目，其中一部分有明確標示原站編號，其餘為針對投影情境自行設計的動態。所有 CSS 均為本專案重新實作，不直接複製原站程式。</p>
+    <p>參考 <a href="https://kittenjam-motion-library.vercel.app/" target="_blank" rel="noreferrer">Kittenjam Motion Library</a> 的元件／動作時機／情境收藏概念，並以 <a href="../transitions/">既有轉場</a>、<a href="../lyrics/">文字效果</a>、<a href="../motion-atlas/">動態圖鑑</a> 排除同質項目。目前已透過實際瀏覽器確認原站 CSS 動畫類別與具體項目，60 種效果涵蓋文字編排、頁面轉場與資訊動態；參考原站的效果提供對應編號，其餘為針對投影情境設計，並排除既有重複效果。所有 CSS 均為本專案重新實作，不直接複製原站程式。</p>
     <p>動畫以 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations" target="_blank" rel="noreferrer">CSS Animations</a>、<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform" target="_blank" rel="noreferrer">transform</a>、<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path" target="_blank" rel="noreferrer">clip-path</a> 實作。大部分換位由合成層處理；格片、陰影、裁切仍可能增加 Paint。開啟「減少動態」可直接切頁。沒有外部動畫套件或網路 API。</p>
   </section>
   <footer><span>ProjectionLabs / Kinetic Slides</span><a href="../">返回實驗室首頁</a></footer>
