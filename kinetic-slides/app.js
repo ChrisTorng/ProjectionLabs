@@ -187,7 +187,7 @@ async function exportOffline() {
       '\n' + appJs.replace(/^import\s*\{\s*effects\s*\}\s*from\s*['"]\.\/effects\.js['"];\s*/m, '');
     const clone = document.documentElement.cloneNode(true);
     clone.querySelector('textarea#slides').textContent = $('slides').value;
-    clone.querySelectorAll('link[rel="stylesheet"]').forEach(link => link.remove());
+    clone.querySelectorAll('link[rel="stylesheet"], link[rel="icon"]').forEach(link => link.remove());
     const style = document.createElement('style');
     style.textContent = css;
     clone.querySelector('head').append(style);
@@ -235,6 +235,10 @@ function init() {
   }
   $('reduced').checked = defaults ? !!defaults.reduced : nativeReduced.matches;
   $('total').textContent = effects.length;
+  // Exported offline HTML contains the rendered DOM; initialize from a clean state.
+  $('effect').replaceChildren();
+  $('tiles').replaceChildren();
+  $('blades').replaceChildren();
   effects.forEach(effect => $('effect').add(new Option(effect.name + ' / ' + effect.category, effect.id)));
   for (let i = 0; i < 12; i++) {
     const tile = document.createElement('div');
