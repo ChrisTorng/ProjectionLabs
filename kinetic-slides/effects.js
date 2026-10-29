@@ -10,7 +10,14 @@ export const effects = [
   { id: 'focus-lane', name: '閱讀焦點軌道', category: '文字編排', level: '柔和', technique: 'translateY · opacity · transform', description: '三行內容沿縱軸依次移向閱讀焦點，其他行退至周邊，不是一般逐行淡入。', usage: '逐句說明、詩歌段落' },
   { id: 'split-editorial', name: '雙欄編輯式換位', category: '文字編排', level: '鮮明', technique: 'CSS Grid · independent transforms', description: '序號／分類與主文從相反方向匯合，保留排版網格的動態張力。', usage: '資訊型簡報、章節首頁' },
   { id: 'accent-rail', name: '重點色帶接力', category: '文字編排', level: '柔和', technique: 'scaleX · clip-path · mix-blend', description: '色帶先跨過標題容器，再揭出下一行；重點在色塊與文字的時間交錯。', usage: '講述重點、字幕提示' },
-  { id: 'poster-stamp', name: '海報印記', category: '文字編排', level: '華麗', technique: 'perspective · rotateZ · scale · shadow', description: '標題以海報印章的手感進場，最後微震定格，維持後續閱讀清晰。', usage: '活動主題、宣傳大字' }
+  { id: 'poster-stamp', name: '海報印記', category: '文字編排', level: '華麗', technique: 'perspective · rotateZ · scale · shadow', description: '標題以海報印章的手感進場，最後微震定格，維持後續閱讀清晰。', usage: '活動主題、宣傳大字' },
+
+  { id: 'laser-cut', name: '雷射切斷', category: '文字編排', level: '華麗', technique: 'clip-path · pseudo-elements · transform', description: '一束亮線切過標題，文字上半與下半分別退場，帶出下一幕。', usage: '章節結束、強烈換頁', reference: '#002 Laser Cut' },
+  { id: 'number-slam', name: '倒數砸落', category: '文字編排', level: '鮮明', technique: 'scale · translateY · impact line', description: '巨型頁碼高速砸入、輕微回彈，再收斂到投影片資訊層。', usage: '倒數、章節編號', reference: '#008 Number Slam' },
+  { id: 'scramble-decode', name: '亂碼解讀', category: '文字編排', level: '鮮明', technique: 'CSS steps · content attr · clip-path', description: '模擬錯誤字元逐步退去，清晰標題分段還原；動畫無逐影格 JavaScript。', usage: '科技主題、數字資訊', reference: '#013 Scramble Decode' },
+  { id: 'water-reflection', name: '水面倒影', category: '文字編排', level: '柔和', technique: 'scaleY · mask-image · blur', description: '標題在下方呈現隨波紋微動的淡化倒影，完成換頁後仍清楚可讀。', usage: '詩歌、抒情畫面', reference: '#017 Water Reflection' },
+  { id: 'kinetic-stack', name: '詞組動態堆疊', category: '文字編排', level: '鮮明', technique: 'CSS custom stagger · translate · rotate', description: '詞組先重疊在畫面中央，再依序滑出成為正常標題排列；不同於彩色字卡。', usage: '大標題、逐詞強調', reference: '#045 Kinetic Stack' },
+  { id: 'scrapbook', name: '剪貼簿拼貼', category: '頁面轉場', level: '活潑', technique: 'pseudo-element collage · transform · shadow', description: '紙卡、膠帶與標題以不同時序落到舞台上，組成像手工拼貼的投影片。', usage: '活動回顧、照片故事', reference: '#187 Scrapbook' }
 ];
 
 export const groups = ['全部效果', '頁面轉場', '文字編排'];
