@@ -80,7 +80,7 @@ try {
   const offline = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   offline.on('pageerror', error => failures.push('Offline: ' + error.message));
   await offline.goto('file://' + path.resolve(target), { waitUntil: 'load' });
-  await offline.waitForFunction(() => document.querySelectorAll('#effect option').length === 12, { timeout: 10000 });
+  await offline.waitForFunction(() => document.querySelectorAll('#effect option').length === 18, { timeout: 10000 });
   assert.equal(await offline.locator('#slides').inputValue(), '台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   assert.equal(await offline.locator('#effect').inputValue(), await page.locator('#effect').inputValue());
   await offline.locator('#next').click();
