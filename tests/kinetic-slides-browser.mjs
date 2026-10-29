@@ -18,8 +18,8 @@ page.on('console', message => { if (message.type() === 'error') issues.push(mess
 try {
   const response = await page.goto(base + '/kinetic-slides/', { waitUntil: 'networkidle', timeout: 30000 });
   assert.equal(response.status(), 200, 'lab must be available over HTTP');
-  await page.waitForFunction(() => document.querySelectorAll('#effect option').length === 18);
-  assert.equal(await page.locator('.effect-card').count(), 18, 'all 18 motion cards visible');
+  await page.waitForFunction(() => document.querySelectorAll('#effect option').length === 60);
+  assert.equal(await page.locator('.effect-card').count(), 60, 'all 60 motion cards visible');
   const names = await page.locator('#effect option').allTextContents();
   console.log('Available effects:', names.join(' | '));
 
@@ -42,6 +42,19 @@ try {
     assert.equal(await page.locator('#screen').evaluate(el => el.classList.contains('is-playing')), false);
     console.log('PASS animation:', effect, '(' + animationName + ')');
   }
+  // All catalog thumbnails must be REAL animation stages, activated lazily.
+  await page.locator('.effect-card').first().scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => document.querySelectorAll('.mini-screen').length > 0, { timeout: 7000 });
+  const totalMini = await page.locator('.mini-screen').count();
+  assert.ok(totalMini < 60, 'offscreen previews should remain unmounted');
+  await page.waitForTimeout(3700);
+  assert.equal(await page.locator('#previewToggle').getAttribute('aria-pressed'), 'false');
+  assert.match(await page.locator('#previewStatus').innerText(), /同步第/);
+  await page.locator('#previewToggle').click();
+  assert.equal(await page.locator('#previewToggle').getAttribute('aria-pressed'), 'true');
+  await page.locator('#previewToggle').click();
+  console.log('PASS synchronized lazy catalog previews:', totalMini);
+
   await page.screenshot({ path: path.join(out, 'desktop.png'), fullPage: true });
 
   // Search, category filter, and manual slide navigation.
@@ -49,7 +62,7 @@ try {
   assert.equal(await page.locator('.effect-card').count(), 1);
   await page.locator('#search').fill('');
   await page.locator('[data-filter="文字編排"]').click();
-  assert.equal(await page.locator('.effect-card').count(), 11);
+  assert.equal(await page.locator('.effect-card').count(), 30);
   await page.locator('[data-filter="全部效果"]').click();
   await page.locator('#slides').fill('台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   await page.locator('#reduced').check();
@@ -64,6 +77,18 @@ try {
   await page.keyboard.press('ArrowRight');
   assert.match(await page.locator('#pageLabel').innerText(), /02 \/ 03/);
   assert.equal(await page.locator('#status').innerText(), '靜態切換完成');
+  // Both navigation dimensions must be available inside the actual stage.
+  const prior = await page.locator('#effect').inputValue();
+  await page.locator('#effectNext').click();
+  assert.notEqual(await page.locator('#effect').inputValue(), prior, 'effect navigation should not require scrolling');
+  await page.locator('#effectPrevious').click();
+  assert.equal(await page.locator('#effect').inputValue(), prior, 'previous effect restores selection');
+  await page.locator('#stageNext').click();
+  assert.match(await page.locator('#pageLabel').innerText(), /03 \/ 03/);
+  await page.locator('#stagePrevious').click();
+  assert.match(await page.locator('#pageLabel').innerText(), /02 \/ 03/);
+  console.log('PASS overlay next/previous effect and slide');
+
   console.log('PASS filter/navigation/reduced-motion');
 
   // A standalone file is required to run without server and without imported modules.
@@ -80,7 +105,7 @@ try {
   const offline = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   offline.on('pageerror', error => failures.push('Offline: ' + error.message));
   await offline.goto('file://' + path.resolve(target), { waitUntil: 'load' });
-  await offline.waitForFunction(() => document.querySelectorAll('#effect option').length === 18, { timeout: 10000 });
+  await offline.waitForFunction(() => document.querySelectorAll('#effect option').length === 60, { timeout: 10000 });
   assert.equal(await offline.locator('#slides').inputValue(), '台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   assert.equal(await offline.locator('#effect').inputValue(), await page.locator('#effect').inputValue());
   assert.equal(await offline.locator('#pageLabel').innerText(), await page.locator('#pageLabel').innerText(), 'export must retain current slide');
@@ -91,6 +116,18 @@ try {
   console.log('PASS standalone HTML file:// playback');
 
   await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.locator('.viewer').evaluate(el => getComputedStyle(el).gridRowStart),'1', 'mobile preview must precede settings');
+  await page.locator('#stageFullscreen').click();
+  await page.waitForTimeout(200);
+  assert.equal(await page.evaluate(() => document.fullscreenElement?.id), 'screen', 'the stage must become fullscreen');
+  const fullscreenEffect = await page.locator('#effect').inputValue();
+  await page.locator('#effectNext').click();
+  assert.notEqual(await page.locator('#effect').inputValue(), fullscreenEffect, 'fullscreen must allow next effect');
+  await page.screenshot({ path: path.join(out, 'fullscreen.png') });
+  await page.locator('#stageFullscreen').click();
+  await page.waitForFunction(() => !document.fullscreenElement);
+  console.log('PASS mobile-stage fullscreen and effect navigation');
+
   await page.screenshot({ path: path.join(out, 'mobile.png'), fullPage: true });
   const dimensions = await page.evaluate(() => ({
     viewport: innerWidth,
