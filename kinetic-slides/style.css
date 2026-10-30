@@ -415,7 +415,7 @@ header{max-width:1440px;margin:auto;padding:16px clamp(16px,3vw,40px);display:fl
 #previewStatus{color:#8aa9c9}
 .effect-grid{grid-template-columns:repeat(auto-fill,minmax(205px,1fr));align-items:stretch}
 .effect-card{padding:9px;min-height:unset;gap:8px;display:block;overflow:hidden}
-.effect-card .thumb{display:block;width:100%;height:auto;aspect-ratio:16 / 9;border-radius:8px;transform:none;overflow:hidden;background:#121b2d}
+.effect-card .thumb{position:relative;display:block;width:100%;height:auto;aspect-ratio:16 / 9;border-radius:8px;transform:none;overflow:hidden;background:#121b2d}
 .effect-card .thumb > i{display:none}
 .effect-card .card-detail{padding:8px 2px 1px}
 .effect-card b{display:block;font-size:13px}
