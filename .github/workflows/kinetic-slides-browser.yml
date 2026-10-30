@@ -40,7 +40,9 @@ jobs:
           sleep 2
           curl --fail --silent --show-error http://127.0.0.1:4173/kinetic-slides/ >/dev/null
       - name: Test animation, navigation, offline HTML and mobile
-        run: node tests/kinetic-slides-browser.mjs
+        run: |
+          node tests/kinetic-slides-interrupt-preview.mjs
+          node tests/kinetic-slides-browser.mjs
       - name: Save visual evidence
         if: always()
         uses: actions/upload-artifact@v4

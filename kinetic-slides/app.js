@@ -5,6 +5,7 @@ const screen = $('screen');
 const nativeReduced = matchMedia('(prefers-reduced-motion: reduce)');
 let selected = effects[0], activeIndex = 0, lastPair = null, playing = false;
 let finishTimer = 0, autoTimer = 0, filter = '全部效果';
+let playbackVersion = 0;
 
 let previewPaused = false;
 let previewPage = 0;
@@ -22,7 +23,9 @@ const previewObserver = ('IntersectionObserver' in window)
         const card = entry.target;
         if (entry.isIntersecting) {
           previewVisible.add(card);
+          updatePreviewDesignSize();
           ensurePreview(card);
+          fitPreview(card);
         } else {
           previewVisible.delete(card);
           card.querySelector('.mini-screen')?.classList.remove('is-playing');
@@ -31,6 +34,44 @@ const previewObserver = ('IntersectionObserver' in window)
     }, {rootMargin:'120px 0px',threshold:0})
   : null;
 let previewTimer = 0;
+
+// Use exactly the same design-space dimensions for the full stage and each
+// animated thumbnail. Scaling the entire stage is essential: film perforations,
+// large numeral overlays, type, borders, and blur radii all scale together.
+let previewDesignWidth = 960;
+let previewDesignHeight = 540;
+function updatePreviewDesignSize() {
+  // Fullscreen is an alternate presentation size, not the card's 16:9 baseline.
+  if (document.fullscreenElement === screen) return;
+  const box = screen.getBoundingClientRect();
+  if (box.width < 10 || box.height < 10) return;
+  previewDesignWidth = box.width;
+  previewDesignHeight = box.height;
+}
+function fitPreview(card) {
+  if (!card?._mini) return;
+  const {screen: miniature} = card._mini;
+  const holder = card.querySelector('.thumb');
+  const width = holder?.getBoundingClientRect().width || 0;
+  if (width <= 0) return;
+  miniature.style.width = previewDesignWidth + 'px';
+  miniature.style.height = previewDesignHeight + 'px';
+  miniature.style.transform = 'scale(' + (width / previewDesignWidth) + ')';
+}
+const previewResizeObserver = ('ResizeObserver' in window)
+  ? new ResizeObserver(entries => {
+      const stageChanged = entries.some(entry => entry.target === screen);
+      if (stageChanged) {
+        updatePreviewDesignSize();
+        for (const card of previewVisible) fitPreview(card);
+      } else {
+        for (const entry of entries) {
+          const card = entry.target.closest('.effect-card');
+          if (card) fitPreview(card);
+        }
+      }
+    })
+  : null;
 
 const pad = n => String(n).padStart(2, '0');
 
@@ -112,6 +153,8 @@ function staticScene() {
   updatePageLabel();
 }
 function cancelPlayback() {
+  // Invalidate the previous completion callback and its auto-advance timer.
+  playbackVersion++;
   clearTimeout(finishTimer);
   clearTimeout(autoTimer);
   playing = false;
@@ -119,8 +162,6 @@ function cancelPlayback() {
 }
 function updateStatus(message) {
   $('status').textContent = message;
-  $('previous').disabled = playing;
-  $('next').disabled = playing;
 }
 function planAuto() {
   clearTimeout(autoTimer);
@@ -129,37 +170,42 @@ function planAuto() {
 function playTo(targetIndex, replayFrom = null) {
   const pages = parsePages();
   if (!pages.length) return;
-  cancelPlayback();
-  const source = replayFrom === null ? activeIndex : ((replayFrom % pages.length) + pages.length) % pages.length;
-  const destination = ((targetIndex % pages.length) + pages.length) % pages.length;
+  const normalize = n => ((n % pages.length) + pages.length) % pages.length;
+  // activeIndex is the committed destination *even during* an animation.
+  // A second click thus starts from the previous destination, not the stale source.
+  const source = replayFrom === null ? normalize(activeIndex) : normalize(replayFrom);
+  const destination = normalize(targetIndex);
+  cancelPlayback(); // Previous animation immediately snaps to its final logical page.
+  const version = playbackVersion;
+  activeIndex = destination;
+  lastPair = [source, destination];
   if ($('reduced').checked || pages.length === 1) {
-    activeIndex = destination;
-    lastPair = [source, destination];
     staticScene();
     updateStatus('靜態切換完成');
     planAuto();
     return;
   }
-  lastPair = [source, destination];
   renderSlide($('fromSlide'), pages[source], source, pages.length);
   renderSlide($('toSlide'), pages[destination], destination, pages.length);
+  updatePageLabel();
   playing = true;
   updateStatus('轉場播放中');
   screen.classList.remove('is-playing');
   void screen.offsetWidth;
   screen.classList.add('is-playing');
-  const duration = +$('duration').value;
   finishTimer = setTimeout(() => {
-    activeIndex = destination;
+    if (version !== playbackVersion) return;
     playing = false;
     staticScene();
     updateStatus('顯示第 ' + (destination + 1) + ' 頁');
     planAuto();
-  }, duration + 180);
+  }, +$('duration').value + 180);
 }
 function replay() {
-  const pair = lastPair || [activeIndex, activeIndex + 1];
-  playTo(pair[1], pair[0]);
+  // Replaying or selecting an effect must never advance to a different slide.
+  const source = lastPair && lastPair[1] === activeIndex
+    ? lastPair[0] : activeIndex - 1;
+  playTo(activeIndex, source);
 }
 function setEffect(id, animate = true) {
   selected = effects.find(effect => effect.id === id) || effects[0];
@@ -210,6 +256,8 @@ function ensurePreview(card){
   const thumb=card.querySelector('.thumb');
   thumb.replaceChildren(mini);
   card._mini={screen:mini,from,to};
+  fitPreview(card);
+  previewResizeObserver?.observe(thumb);
   const page=previewTexts[previewPage%previewTexts.length];
   renderSlide(from,page,previewPage%previewTexts.length,previewTexts.length);
   renderSlide(to,previewTexts[(previewPage+1)%previewTexts.length],(previewPage+1)%previewTexts.length,previewTexts.length);
@@ -236,6 +284,8 @@ function renderCards() {
     && [effect.name,effect.category,effect.technique,effect.description,effect.usage,effect.reference||'']
       .join(' ').toLowerCase().includes(keyword));
   previewObserver?.disconnect();
+  previewResizeObserver?.disconnect();
+  previewResizeObserver?.observe(screen);
   previewVisible.clear();
   $('cards').replaceChildren();
   for(const effect of matches){
@@ -366,7 +416,10 @@ function init() {
   updateSettings();
   staticScene();
   setEffect(defaults?.effect || effects[0].id, false);
+  updatePreviewDesignSize();
   renderCards();
+  if (!previewResizeObserver) window.addEventListener('resize', () => { updatePreviewDesignSize(); for (const card of previewVisible) fitPreview(card); });
+  document.addEventListener('fullscreenchange', () => { updatePreviewDesignSize(); for (const card of previewVisible) fitPreview(card); });
   $('effect').addEventListener('change', () => setEffect($('effect').value));
   $('slides').addEventListener('input', () => { cancelPlayback(); lastPair = null; staticScene(); updateStatus('已更新投影片文字'); planAuto(); });
   ['duration', 'accent', 'easing', 'backdrop'].forEach(id => $(id).addEventListener('input', updateSettings));
@@ -374,8 +427,6 @@ function init() {
   $('auto').addEventListener('change', planAuto);
   $('effectPrevious').addEventListener('click', () => selectAdjacentEffect(-1));
   $('effectNext').addEventListener('click', () => selectAdjacentEffect(1));
-  $('previousEffect').addEventListener('click', () => selectAdjacentEffect(-1));
-  $('nextEffect').addEventListener('click', () => selectAdjacentEffect(1));
   $('stagePrevious').addEventListener('click', () => playTo(activeIndex - 1));
   $('stageNext').addEventListener('click', () => playTo(activeIndex + 1));
   $('stageFullscreen').addEventListener('click', () => $('fullscreen').click());
@@ -388,10 +439,7 @@ function init() {
     else advancePreviews();
   });
   if(!previewTimer)previewTimer=setInterval(advancePreviews,previewCycle);
-  $('previous').addEventListener('click', () => playTo(activeIndex - 1));
-  $('next').addEventListener('click', () => playTo(activeIndex + 1));
   $('replay').addEventListener('click', replay);
-  $('random').addEventListener('click', () => setEffect(effects[Math.floor(Math.random() * effects.length)].id));
   $('search').addEventListener('input', renderCards);
   document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
     filter = button.dataset.filter;
