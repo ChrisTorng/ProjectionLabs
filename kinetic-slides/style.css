@@ -413,7 +413,7 @@ header{max-width:1440px;margin:auto;padding:16px clamp(16px,3vw,40px);display:fl
 .catalog-preview-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:12px;color:#afc5df;margin:8px 0 13px}
 .catalog-preview-tools button{margin-left:auto}
 #previewStatus{color:#8aa9c9}
-.effect-grid{grid-template-columns:repeat(auto-fit,minmax(205px,1fr));align-items:stretch}
+.effect-grid{grid-template-columns:repeat(auto-fill,minmax(205px,1fr));align-items:stretch}
 .effect-card{padding:9px;min-height:unset;gap:8px;display:block;overflow:hidden}
 .effect-card .thumb{display:block;width:100%;height:auto;aspect-ratio:16 / 9;border-radius:8px;transform:none;overflow:hidden;background:#121b2d}
 .effect-card .thumb > i{display:none}
