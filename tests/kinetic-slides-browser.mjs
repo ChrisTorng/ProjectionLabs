@@ -67,11 +67,11 @@ try {
   await page.locator('#slides').fill('台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   await page.locator('#reduced').check();
   // Editing should preserve the currently selected slide; navigate to page 1 explicitly.
-  for (let step = 0; step < 3 && !(await page.locator('#pageLabel').innerText()).startsWith('01 /'); step++) await page.click('#previous');
+  for (let step = 0; step < 3 && !(await page.locator('#pageLabel').innerText()).startsWith('01 /'); step++) await page.click('#stagePrevious');
   assert.match(await page.locator('#pageLabel').innerText(), /01 \/ 03/);
-  await page.click('#next');
+  await page.click('#stageNext');
   assert.match(await page.locator('#pageLabel').innerText(), /02 \/ 03/);
-  await page.click('#previous');
+  await page.click('#stagePrevious');
   assert.match(await page.locator('#pageLabel').innerText(), /01 \/ 03/);
   await page.locator('#screen').focus();
   await page.keyboard.press('ArrowRight');
@@ -109,7 +109,7 @@ try {
   assert.equal(await offline.locator('#slides').inputValue(), '台北的夜景 | 第一頁\n新的投影 | 第二頁\n最後一幕 | 第三頁');
   assert.equal(await offline.locator('#effect').inputValue(), await page.locator('#effect').inputValue());
   assert.equal(await offline.locator('#pageLabel').innerText(), await page.locator('#pageLabel').innerText(), 'export must retain current slide');
-  await offline.locator('#next').click();
+  await offline.locator('#stageNext').click();
   assert.match(await offline.locator('#pageLabel').innerText(), /03 \/ 03/);
   await offline.screenshot({ path: path.join(out, 'offline.png'), fullPage: true });
   await offline.close();
