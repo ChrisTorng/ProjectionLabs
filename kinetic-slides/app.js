@@ -33,6 +33,44 @@ const previewObserver = ('IntersectionObserver' in window)
   : null;
 let previewTimer = 0;
 
+// Use exactly the same design-space dimensions for the full stage and each
+// animated thumbnail. Scaling the entire stage is essential: film perforations,
+// large numeral overlays, type, borders, and blur radii all scale together.
+let previewDesignWidth = 960;
+let previewDesignHeight = 540;
+function updatePreviewDesignSize() {
+  // Fullscreen is an alternate presentation size, not the card's 16:9 baseline.
+  if (document.fullscreenElement === screen) return;
+  const box = screen.getBoundingClientRect();
+  if (box.width < 10 || box.height < 10) return;
+  previewDesignWidth = box.width;
+  previewDesignHeight = box.height;
+}
+function fitPreview(card) {
+  if (!card?._mini) return;
+  const {screen: miniature} = card._mini;
+  const holder = card.querySelector('.thumb');
+  const width = holder?.getBoundingClientRect().width || 0;
+  if (width <= 0) return;
+  miniature.style.width = previewDesignWidth + 'px';
+  miniature.style.height = previewDesignHeight + 'px';
+  miniature.style.transform = 'scale(' + (width / previewDesignWidth) + ')';
+}
+const previewResizeObserver = ('ResizeObserver' in window)
+  ? new ResizeObserver(entries => {
+      const stageChanged = entries.some(entry => entry.target === screen);
+      if (stageChanged) {
+        updatePreviewDesignSize();
+        for (const card of previewVisible) fitPreview(card);
+      } else {
+        for (const entry of entries) {
+          const card = entry.target.closest('.effect-card');
+          if (card) fitPreview(card);
+        }
+      }
+    })
+  : null;
+
 const pad = n => String(n).padStart(2, '0');
 
 function parsePages() {
@@ -214,6 +252,8 @@ function ensurePreview(card){
   const thumb=card.querySelector('.thumb');
   thumb.replaceChildren(mini);
   card._mini={screen:mini,from,to};
+  fitPreview(card);
+  previewResizeObserver?.observe(thumb);
   const page=previewTexts[previewPage%previewTexts.length];
   renderSlide(from,page,previewPage%previewTexts.length,previewTexts.length);
   renderSlide(to,previewTexts[(previewPage+1)%previewTexts.length],(previewPage+1)%previewTexts.length,previewTexts.length);
@@ -240,6 +280,8 @@ function renderCards() {
     && [effect.name,effect.category,effect.technique,effect.description,effect.usage,effect.reference||'']
       .join(' ').toLowerCase().includes(keyword));
   previewObserver?.disconnect();
+  previewResizeObserver?.disconnect();
+  previewResizeObserver?.observe(screen);
   previewVisible.clear();
   $('cards').replaceChildren();
   for(const effect of matches){
@@ -370,7 +412,10 @@ function init() {
   updateSettings();
   staticScene();
   setEffect(defaults?.effect || effects[0].id, false);
+  updatePreviewDesignSize();
   renderCards();
+  if (!previewResizeObserver) window.addEventListener('resize', () => { updatePreviewDesignSize(); for (const card of previewVisible) fitPreview(card); });
+  document.addEventListener('fullscreenchange', () => { updatePreviewDesignSize(); for (const card of previewVisible) fitPreview(card); });
   $('effect').addEventListener('change', () => setEffect($('effect').value));
   $('slides').addEventListener('input', () => { cancelPlayback(); lastPair = null; staticScene(); updateStatus('已更新投影片文字'); planAuto(); });
   ['duration', 'accent', 'easing', 'backdrop'].forEach(id => $(id).addEventListener('input', updateSettings));
