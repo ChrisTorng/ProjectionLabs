@@ -129,6 +129,11 @@ try {
       const miniCorner=getComputedStyle(mini.querySelector('.to .corner-index')).fontSize;
       const mainPadding=getComputedStyle(main.querySelector('.from')).paddingTop;
       const miniPadding=getComputedStyle(mini.querySelector('.from')).paddingTop;
+      const previewTitleBox=mini.querySelector('.from .title').getBoundingClientRect();
+      const visibleWidth=Math.max(0,Math.min(thumbBox.right,previewTitleBox.right)-Math.max(thumbBox.left,previewTitleBox.left));
+      const visibleHeight=Math.max(0,Math.min(thumbBox.bottom,previewTitleBox.bottom)-Math.max(thumbBox.top,previewTitleBox.top));
+      const visibleTitlePixels=visibleWidth*visibleHeight;
+      const fromOpacity=Number(getComputedStyle(mini.querySelector('.from')).opacity);
       main.dataset.effect=previous;
       return {
         id:card.dataset.id,
@@ -136,7 +141,7 @@ try {
         designWidth:parseFloat(mini.style.width),
         thumbWidth:thumbBox.width,
         renderedWidth:miniBox.width,
-        mainTitle,miniTitle,mainCorner,miniCorner,mainPadding,miniPadding
+        mainTitle,miniTitle,mainCorner,miniCorner,mainPadding,miniPadding,visibleTitlePixels,fromOpacity
       };
     });
     assert.ok(Math.abs(dims.stageWidth-dims.designWidth)<1,dims.id+': miniature design width differs from full stage');
@@ -144,6 +149,7 @@ try {
     assert.equal(dims.mainTitle,dims.miniTitle,dims.id+': title font size mismatch');
     assert.equal(dims.mainCorner,dims.miniCorner,dims.id+': corner numeral font size mismatch');
     assert.equal(dims.mainPadding,dims.miniPadding,dims.id+': slide padding mismatch');
+    assert.ok(dims.visibleTitlePixels>2 && dims.fromOpacity>.95,dims.id+': thumbnail must render visible title inside its card');
     minMounted++;
   }
   console.log('PASS identical stage geometry and type/overlay sizes for all',minMounted,'effects');
