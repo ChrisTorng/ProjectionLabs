@@ -28,6 +28,9 @@ try {
   assert.equal(await page.locator('#pageLabel').innerText(), '01 / 04');
 
   await page.selectOption('#effect', 'film-strip');
+  assert.equal(await page.locator('#pageLabel').innerText(), '01 / 04', 'selecting an effect must not change the page');
+  await page.locator('#replay').click();
+  assert.equal(await page.locator('#pageLabel').innerText(), '01 / 04', 'replay must not change the page');
   await page.locator('#duration').evaluate(e => { e.value='2400'; e.dispatchEvent(new Event('input',{bubbles:true})); });
   await page.locator('#reduced').uncheck();
   const presses = [
