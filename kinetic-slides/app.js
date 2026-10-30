@@ -5,6 +5,7 @@ const screen = $('screen');
 const nativeReduced = matchMedia('(prefers-reduced-motion: reduce)');
 let selected = effects[0], activeIndex = 0, lastPair = null, playing = false;
 let finishTimer = 0, autoTimer = 0, filter = '全部效果';
+let playbackVersion = 0;
 
 let previewPaused = false;
 let previewPage = 0;
@@ -112,6 +113,8 @@ function staticScene() {
   updatePageLabel();
 }
 function cancelPlayback() {
+  // Invalidate the previous completion callback and its auto-advance timer.
+  playbackVersion++;
   clearTimeout(finishTimer);
   clearTimeout(autoTimer);
   playing = false;
@@ -119,8 +122,6 @@ function cancelPlayback() {
 }
 function updateStatus(message) {
   $('status').textContent = message;
-  $('previous').disabled = playing;
-  $('next').disabled = playing;
 }
 function planAuto() {
   clearTimeout(autoTimer);
@@ -129,33 +130,36 @@ function planAuto() {
 function playTo(targetIndex, replayFrom = null) {
   const pages = parsePages();
   if (!pages.length) return;
-  cancelPlayback();
-  const source = replayFrom === null ? activeIndex : ((replayFrom % pages.length) + pages.length) % pages.length;
-  const destination = ((targetIndex % pages.length) + pages.length) % pages.length;
+  const normalize = n => ((n % pages.length) + pages.length) % pages.length;
+  // activeIndex is the committed destination *even during* an animation.
+  // A second click thus starts from the previous destination, not the stale source.
+  const source = replayFrom === null ? normalize(activeIndex) : normalize(replayFrom);
+  const destination = normalize(targetIndex);
+  cancelPlayback(); // Previous animation immediately snaps to its final logical page.
+  const version = playbackVersion;
+  activeIndex = destination;
+  lastPair = [source, destination];
   if ($('reduced').checked || pages.length === 1) {
-    activeIndex = destination;
-    lastPair = [source, destination];
     staticScene();
     updateStatus('靜態切換完成');
     planAuto();
     return;
   }
-  lastPair = [source, destination];
   renderSlide($('fromSlide'), pages[source], source, pages.length);
   renderSlide($('toSlide'), pages[destination], destination, pages.length);
+  updatePageLabel();
   playing = true;
   updateStatus('轉場播放中');
   screen.classList.remove('is-playing');
   void screen.offsetWidth;
   screen.classList.add('is-playing');
-  const duration = +$('duration').value;
   finishTimer = setTimeout(() => {
-    activeIndex = destination;
+    if (version !== playbackVersion) return;
     playing = false;
     staticScene();
     updateStatus('顯示第 ' + (destination + 1) + ' 頁');
     planAuto();
-  }, duration + 180);
+  }, +$('duration').value + 180);
 }
 function replay() {
   const pair = lastPair || [activeIndex, activeIndex + 1];
@@ -374,8 +378,6 @@ function init() {
   $('auto').addEventListener('change', planAuto);
   $('effectPrevious').addEventListener('click', () => selectAdjacentEffect(-1));
   $('effectNext').addEventListener('click', () => selectAdjacentEffect(1));
-  $('previousEffect').addEventListener('click', () => selectAdjacentEffect(-1));
-  $('nextEffect').addEventListener('click', () => selectAdjacentEffect(1));
   $('stagePrevious').addEventListener('click', () => playTo(activeIndex - 1));
   $('stageNext').addEventListener('click', () => playTo(activeIndex + 1));
   $('stageFullscreen').addEventListener('click', () => $('fullscreen').click());
@@ -388,10 +390,7 @@ function init() {
     else advancePreviews();
   });
   if(!previewTimer)previewTimer=setInterval(advancePreviews,previewCycle);
-  $('previous').addEventListener('click', () => playTo(activeIndex - 1));
-  $('next').addEventListener('click', () => playTo(activeIndex + 1));
   $('replay').addEventListener('click', replay);
-  $('random').addEventListener('click', () => setEffect(effects[Math.floor(Math.random() * effects.length)].id));
   $('search').addEventListener('input', renderCards);
   document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
     filter = button.dataset.filter;
