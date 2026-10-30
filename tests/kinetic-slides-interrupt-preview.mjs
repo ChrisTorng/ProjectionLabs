@@ -30,11 +30,17 @@ try {
   await page.selectOption('#effect', 'film-strip');
   await page.locator('#duration').evaluate(e => { e.value='2400'; e.dispatchEvent(new Event('input',{bubbles:true})); });
   await page.locator('#reduced').uncheck();
-  for (const expected of ['02 / 04','03 / 04','04 / 04','03 / 04','02 / 04','03 / 04','02 / 04']) {
-    await page.locator(expected==='03 / 04' && (await page.locator('#pageLabel').innerText())==='04 / 04' ? '#stagePrevious' :
-      expected==='02 / 04' && (await page.locator('#pageLabel').innerText())==='03 / 04' ? '#stagePrevious' : '#stageNext').click();
-    assert.equal(await page.locator('#pageLabel').innerText(), expected,
-      'rapid navigation must commit exactly one new page per click');
+  const presses = [
+    ['#stageNext','02 / 04'],['#stageNext','03 / 04'],['#stageNext','04 / 04'],
+    ['#stagePrevious','03 / 04'],['#stagePrevious','02 / 04'],
+    ['#stageNext','03 / 04'],['#stagePrevious','02 / 04']
+  ];
+  for (const [control,expected] of presses) {
+    const before=await page.locator('#pageLabel').innerText();
+    await page.locator(control).click();
+    const actual=await page.locator('#pageLabel').innerText();
+    console.log('NAV',before,control,'=>',actual,'expected',expected);
+    assert.equal(actual,expected,'rapid navigation must commit exactly one new page per click');
     assert.equal(await page.locator('#stageNext').isEnabled(),true);
     assert.equal(await page.locator('#stagePrevious').isEnabled(),true);
     assert.equal(await page.locator('#screen').evaluate(el=>el.classList.contains('is-playing')),true);
@@ -45,6 +51,7 @@ try {
   assert.equal(await page.locator('#screen').evaluate(el=>el.classList.contains('is-playing')),false);
   console.log('PASS immediate 7-click forward/back interruptible navigation with no stale-page rollback');
 
+  await page.locator('#reduced').check(); // Freeze thumbnail geometry for bounding-box assertions.
   await page.locator('#search').fill('膠卷');
   const filmCard=page.locator('.effect-card[data-id="film-strip"]');
   await filmCard.scrollIntoViewIfNeeded();
