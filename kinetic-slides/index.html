@@ -59,16 +59,10 @@
         <div class="blade-layer" id="blades" aria-hidden="true"></div>
         <div class="bottomline"><span id="pageLabel">01 / 04</span><span id="effectLabel">層疊卡片交接</span></div>
         <div class="stage-transport" aria-label="舞台快速操作">
-          <div class="stage-group stage-effects"><button type="button" id="effectPrevious" aria-label="上一個效果">◀ 效果</button><button type="button" id="effectNext" aria-label="下一個效果">效果 ▶</button></div>
-          <div class="stage-group stage-pages"><button type="button" id="stagePrevious" aria-label="上一頁">◀ 頁</button><button type="button" id="stageNext" aria-label="下一頁">頁 ▶</button></div>
+          <div class="stage-group stage-effects"><button type="button" id="effectPrevious" aria-label="上一個效果">◀ 上個效果</button><button type="button" id="effectNext" aria-label="下一個效果">下個效果 ▶</button></div>
+          <div class="stage-group stage-pages"><button type="button" id="stagePrevious" aria-label="上一頁">◀ 上一頁</button><button type="button" id="stageNext" aria-label="下一頁">下一頁 ▶</button></div>
           <button type="button" id="stageFullscreen" class="stage-fullscreen" aria-label="切換全螢幕">⛶</button>
         </div>
-      </div>
-      <div class="transport">
-        <button id="previousEffect" type="button" class="btn">← 上個效果</button><button id="nextEffect" type="button" class="btn primary">下個效果 →</button><button id="previous" type="button" class="btn">← 上一頁</button>
-        <button id="next" type="button" class="btn primary">下一頁 →</button>
-        <button id="random" type="button" class="btn">隨機效果</button>
-        <span id="status" class="status" role="status" aria-live="polite">準備播放</span>
       </div>
       <div class="description">
         <p><strong id="effectName">層疊卡片交接</strong>　<span id="effectCategory">頁面轉場</span> · <span id="effectLevel">鮮明</span></p>
@@ -76,7 +70,7 @@
         <p>核心技術：<span id="technique"></span>　適合：<span id="usage"></span></p>
         <p><a id="reference" href="https://kittenjam-motion-library.vercel.app/" target="_blank" rel="noreferrer" hidden></a></p>
       </div>
-      <div class="viewer-footer"><span class="meta">畫面內可直接切換效果與換頁，全螢幕同樣適用。← → 換頁 · ↑ ↓ 換效果 · 空白鍵重播 · F 全螢幕</span><button id="download" type="button" class="btn">匯出離線 HTML</button></div>
+      <div class="viewer-footer"><span class="status" id="status" role="status" aria-live="polite">準備播放</span><span class="meta">可在動畫途中立即換頁，連按會逐頁前進。← → 換頁 · ↑ ↓ 換效果 · 空白鍵重播 · F 全螢幕</span><button id="download" type="button" class="btn">匯出離線 HTML</button></div>
     </section>
   </div>
   <section class="catalog" id="catalog">
