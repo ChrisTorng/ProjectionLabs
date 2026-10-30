@@ -59,6 +59,17 @@ try {
   const filmCard=page.locator('.effect-card[data-id="film-strip"]');
   await filmCard.scrollIntoViewIfNeeded();
   await filmCard.locator('.mini-screen').waitFor({state:'attached'});
+  const probe=await filmCard.evaluate(card=>{
+    const thumb=card.querySelector('.thumb'),mini=card.querySelector('.mini-screen'),from=mini.querySelector('.from'),to=mini.querySelector('.to');
+    const title=from.querySelector('.title');
+    const compact=el=>({rect:el.getBoundingClientRect().toJSON(),opacity:getComputedStyle(el).opacity,display:getComputedStyle(el).display,visibility:getComputedStyle(el).visibility,transform:getComputedStyle(el).transform,overflow:getComputedStyle(el).overflow,clipPath:getComputedStyle(el).clipPath});
+    return {thumb:compact(thumb),mini:compact(mini),from:compact(from),to:compact(to),title:compact(title),text:title.textContent,html:from.innerHTML.slice(0,400)};
+  });
+  console.log('PREVIEW_PROBE',JSON.stringify(probe));
+  // A ratio can be correct while the slide itself is clipped or invisible.
+  const intersection=Math.max(0,Math.min(probe.thumb.rect.right,probe.title.rect.right)-Math.max(probe.thumb.rect.left,probe.title.rect.left))
+    *Math.max(0,Math.min(probe.thumb.rect.bottom,probe.title.rect.bottom)-Math.max(probe.thumb.rect.top,probe.title.rect.top));
+  assert.ok(intersection>0 && Number(probe.from.opacity)>0, 'thumbnail content must actually be visible inside the card');
   const film = await filmCard.evaluate(card=>{
     const main=document.getElementById('screen'), mini=card.querySelector('.mini-screen');
     const mainEffect=main.dataset.effect;
