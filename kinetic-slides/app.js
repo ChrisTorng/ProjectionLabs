@@ -200,8 +200,10 @@ function playTo(targetIndex, replayFrom = null) {
   }, +$('duration').value + 180);
 }
 function replay() {
-  const pair = lastPair || [activeIndex, activeIndex + 1];
-  playTo(pair[1], pair[0]);
+  // Replaying or selecting an effect must never advance to a different slide.
+  const source = lastPair && lastPair[1] === activeIndex
+    ? lastPair[0] : activeIndex - 1;
+  playTo(activeIndex, source);
 }
 function setEffect(id, animate = true) {
   selected = effects.find(effect => effect.id === id) || effects[0];
