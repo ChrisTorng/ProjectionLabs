@@ -23,7 +23,9 @@ const previewObserver = ('IntersectionObserver' in window)
         const card = entry.target;
         if (entry.isIntersecting) {
           previewVisible.add(card);
+          updatePreviewDesignSize();
           ensurePreview(card);
+          fitPreview(card);
         } else {
           previewVisible.delete(card);
           card.querySelector('.mini-screen')?.classList.remove('is-playing');
