@@ -11,7 +11,7 @@
 | 實驗室 | 線上入口 | 原始碼入口 | 簡介 |
 | --- | --- | --- | --- |
 | 動態編排與轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/kinetic-slides/) | [kinetic-slides/](kinetic-slides/) | 60 種動態編排與轉場案例。 |
-| 互動敘事世界 | [開啟](https://christorng.idv.tw/ProjectionLabs/interactive-worlds/) | [interactive-worlds/](interactive-worlds/) | 四種空間敘事、線性投影片對照、雙視窗投影、講員備忘及離線 HTML 匯出。 |
+| 連續 3D 世界換場 | [開啟](https://christorng.idv.tw/ProjectionLabs/interactive-worlds/) | [interactive-worlds/](interactive-worlds/) | 四種連續 3D 場景、五頁歌詞與事件、環形轉場、反向與自動循環、離線 HTML 匯出。 |
 | 動態效果組合室 | [開啟](https://christorng.idv.tw/ProjectionLabs/composer/) | [composer/](composer/) | 移植原有 Motion Composer：七個獨立圖層、65 種非空效果、10 組預設、四種頁面排列／接力模式；三頁可編輯內容與完整播放器 HTML 匯出。 |
 | HTML-in-Canvas 原生實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/html-in-canvas/) | [html-in-canvas/](html-in-canvas/) | 7 個獨立場景：真實 HTML 排版、表單互動、2D 多層特效、卡片動畫、WebGL 原生 HTML 紋理、事件式重繪與 16:9 投影。偵測 Origin Trial 並區分原生/替代模式。 |
 | 新世代 CSS 技術實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/new-css/) | [new-css/](new-css/) | 17 個獨立案例，涵蓋 Chromium 2025–2026 已推出的新 CSS 與效能最佳實務。可切換傳統／新 CSS、複製程式碼、匯出單檔 HTML，並觀察前景影格間隔與長任務。 |
@@ -240,8 +240,8 @@ Dialogue: 0,0:00:00.00,0:00:03.38,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf
 參考：[官方 API 介紹](https://developer.chrome.com/blog/html-in-canvas-origin-trial?hl=zh-tw)、[官方 2026 年 9 月變更](https://developer.chrome.com/blog/html-in-canvas-ot-changes?hl=zh-tw)、[WICG 提案](https://github.com/WICG/html-in-canvas)、[Edge Origin Trial](https://developer.microsoft.com/en-us/microsoft-edge/origin-trials/trials/a297467e-0030-4c4c-8739-48e130026c03)。
 
 
-## 互動敘事世界實驗室
+## 連續 3D 世界換場實驗室
 
 [線上入口](https://christorng.idv.tw/ProjectionLabs/interactive-worlds/) · [協作指南](interactive-worlds/AGENTS.md) · [靈感來源](https://www.breakingchange.blog/p/fewer-slides-more-dragons)
 
-以同一組六站內容比較聚落、行星、旅程、包浩斯幾何構圖及傳統線性投影片。可以自由探索或循序導覽；投影舞台為 16:9，獨立視窗以同源 BroadcastChannel 同步。支援講員備忘、JSON 匯入匯出與單檔 HTML 匯出，無外部依賴。
+以同一組五頁歌詞比較聚落關卡、行星航行、山谷旅程及幾何立體舞台。原生 Canvas 透視投影、3D 幾何與深度排序；角色及鏡頭沿封閉 Catmull–Rom 曲線移動，第五站返回第一站不重設。支援反向與多站跳轉、五種事件、可調轉場及停留、自動循環、16:9 全螢幕、自訂歌詞與離線 HTML 匯出，無外部依賴。
