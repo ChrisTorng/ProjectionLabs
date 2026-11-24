@@ -1,6 +1,6 @@
 # ProjectionLabs
 
-十個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
+十二個一般 Web 投影效果實驗室，集中收錄既有的效果組合、CSS 圖鑑、音樂動態與詩歌手繪成品，以及三個分項效果工作台。以同一段文字比較不同風格，從安靜的微動態，到華麗的光影、聲音反應與逐筆繪畫。
 
 **網站入口：[christorng.idv.tw/ProjectionLabs/](https://christorng.idv.tw/ProjectionLabs/)**
 
@@ -10,6 +10,8 @@
 
 | 實驗室 | 線上入口 | 原始碼入口 | 簡介 |
 | --- | --- | --- | --- |
+| 動態編排與轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/kinetic-slides/) | [kinetic-slides/](kinetic-slides/) | 60 種動態編排與轉場案例。 |
+| 互動敘事世界 | [開啟](https://christorng.idv.tw/ProjectionLabs/interactive-worlds/) | [interactive-worlds/](interactive-worlds/) | 四種空間敘事、線性投影片對照、雙視窗投影、講員備忘及離線 HTML 匯出。 |
 | 動態效果組合室 | [開啟](https://christorng.idv.tw/ProjectionLabs/composer/) | [composer/](composer/) | 移植原有 Motion Composer：七個獨立圖層、65 種非空效果、10 組預設、四種頁面排列／接力模式；三頁可編輯內容與完整播放器 HTML 匯出。 |
 | HTML-in-Canvas 原生實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/html-in-canvas/) | [html-in-canvas/](html-in-canvas/) | 7 個獨立場景：真實 HTML 排版、表單互動、2D 多層特效、卡片動畫、WebGL 原生 HTML 紋理、事件式重繪與 16:9 投影。偵測 Origin Trial 並區分原生/替代模式。 |
 | 新世代 CSS 技術實驗室 | [開啟](https://christorng.idv.tw/ProjectionLabs/new-css/) | [new-css/](new-css/) | 17 個獨立案例，涵蓋 Chromium 2025–2026 已推出的新 CSS 與效能最佳實務。可切換傳統／新 CSS、複製程式碼、匯出單檔 HTML，並觀察前景影格間隔與長任務。 |
@@ -20,7 +22,7 @@
 | 投影片轉場 | [開啟](https://christorng.idv.tw/ProjectionLabs/transitions/) | [transitions/](transitions/) | 24 種效果：淡化、推移、遮罩揭露、立體翻頁與彈性換頁；以兩張投影片展示真正的前後交接。 |
 | 動態背景 | [開啟](https://christorng.idv.tw/ProjectionLabs/backgrounds/) | [backgrounds/](backgrounds/) | 24 種效果：柔光、色彩流動、幾何圖樣與抽象舞台；文字保留在前景。 |
 
-共 **10 個已列於首頁的獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
+共 **12 個已列於首頁的獨立子目錄頁面**。上面四個入口來自既有成品，下面三個分項工作台另提供 **96 種效果**。不同實驗室的技法有重疊，各頁的數量代表該頁可選效果，不將它們相加宣稱為不重複的效果總數。
 
 ## 既有成品的移植範圍
 
@@ -236,3 +238,10 @@ Dialogue: 0,0:00:00.00,0:00:03.38,Default,,0,0,0,,{\kf25}祢{\kf25}的{\k50}{\kf
 - WebGL shader 產生的紋理扭曲不等於 DOM 命中區域自動扭曲。此案例標示為視覺示範，不宣稱真實 3D 命中測試已同步。
 
 參考：[官方 API 介紹](https://developer.chrome.com/blog/html-in-canvas-origin-trial?hl=zh-tw)、[官方 2026 年 9 月變更](https://developer.chrome.com/blog/html-in-canvas-ot-changes?hl=zh-tw)、[WICG 提案](https://github.com/WICG/html-in-canvas)、[Edge Origin Trial](https://developer.microsoft.com/en-us/microsoft-edge/origin-trials/trials/a297467e-0030-4c4c-8739-48e130026c03)。
+
+
+## 互動敘事世界實驗室
+
+[線上入口](https://christorng.idv.tw/ProjectionLabs/interactive-worlds/) · [協作指南](interactive-worlds/AGENTS.md) · [靈感來源](https://www.breakingchange.blog/p/fewer-slides-more-dragons)
+
+以同一組六站內容比較聚落、行星、旅程、包浩斯幾何構圖及傳統線性投影片。可以自由探索或循序導覽；投影舞台為 16:9，獨立視窗以同源 BroadcastChannel 同步。支援講員備忘、JSON 匯入匯出與單檔 HTML 匯出，無外部依賴。
