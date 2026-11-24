@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>互動敘事世界 · ProjectionLabs</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Microsoft JhengHei",sans-serif;background:#0c1320;color:#e6edf5;--muted:#a6b5c8}
+*{box-sizing:border-box}body{margin:0}button,select,textarea{font:inherit}button,select{color:inherit;background:#182536;border:1px solid #40516a;border-radius:8px;padding:.65rem .85rem;cursor:pointer}button:hover,button:focus-visible,select:focus-visible{border-color:#8ce1d6}button[aria-pressed=true]{background:#275455;border-color:#8ce1d6}button:disabled{opacity:.4;cursor:default}a{color:#9bded7}h1,h2,p{margin:0}header,main{max-width:1440px;margin:auto;padding:16px 24px}header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}header a{text-decoration:none}header span{color:var(--muted);font-size:.85rem}.intro{display:grid;gap:10px;margin-bottom:18px}.intro h1{font-size:clamp(1.6rem,3vw,2.5rem)}.intro p,.hint{color:var(--muted);line-height:1.6}.tools,.navigation{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}.tools .spacer{flex:1}.stage-shell{width:100%;background:#060a10;display:grid;place-items:center;overflow:hidden}.stage{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;isolation:isolate;container-type:inline-size;background:#102233;color:#fff;--accent:#ffe8a5;--ink:#13263b}
+.stage-shell:fullscreen,.stage-shell.theater{width:100vw;height:100dvh;display:grid;place-items:center;background:#000}.stage-shell:fullscreen .stage,.stage-shell.theater .stage{width:min(100vw,177.77778dvh)}.stage-shell.theater{position:fixed;inset:0;z-index:20}.exit{position:absolute;top:8px;right:8px;z-index:30;display:none;font-size:12px}.stage-shell:fullscreen .exit,.stage-shell.theater .exit{display:block;opacity:.65}.stage-shell:fullscreen .exit:not(:hover),.stage-shell.theater .exit:not(:hover){opacity:.25}
+.scene-title{position:absolute;top:5%;left:5%;right:5%;z-index:3;display:flex;align-items:flex-start;justify-content:space-between;gap:2cqw;pointer-events:none}.scene-title h2{font-size:3.35cqw;letter-spacing:.03em;line-height:1.1}.scene-title small{font-size:1.05cqw;letter-spacing:.18em;color:var(--accent)}.scene-title .counter{font-size:1.35cqw;white-space:nowrap;opacity:.85}.world{position:absolute;inset:16% 35% 8% 3%;overflow:hidden}.world svg{position:absolute;width:100%;height:100%;inset:0}.node{position:absolute;transform:translate(-50%,-50%);width:15%;height:auto;aspect-ratio:1;display:grid;place-items:center;align-content:center;padding:0;background:#162b39;border:1px solid #dcefd450;color:#fff;border-radius:50%;box-shadow:0 0 0 .45cqw #ffffff0b;z-index:2;transition:box-shadow .2s,background .2s,scale .2s;cursor:pointer;overflow:visible}.node .symbol{font-size:3.4cqw;line-height:1}.node .label{position:absolute;top:103%;font-size:1.6cqw;font-weight:700;white-space:nowrap;text-shadow:0 2px 5px #000;color:#fff}.node[aria-pressed=true]{background:var(--accent);color:var(--ink);border-color:white;box-shadow:0 0 0 .6cqw #ffffff33,0 0 2.4cqw #fff5;scale:1.12}.node[aria-pressed=true] .label{color:var(--accent)}.node:focus-visible{outline:3px solid white;outline-offset:4px}.node.visited:not([aria-pressed=true]){border:2px solid var(--accent)}.detail{position:absolute;top:21%;right:4%;bottom:11%;width:30%;padding:2.1cqw;display:flex;flex-direction:column;justify-content:center;gap:1.4cqw;background:#102033ed;border:1px solid #ffffff35;border-radius:1.4cqw;z-index:3;overflow:hidden}.detail .eyebrow{font-size:1.15cqw;color:var(--accent);letter-spacing:.15em}.detail h3{font-size:3.6cqw;line-height:1.15;margin:0;overflow-wrap:anywhere}.detail p{font-size:1.9cqw;line-height:1.55;overflow-wrap:anywhere}.detail .action{font-size:1.32cqw;color:var(--accent);line-height:1.5}.detail.animate{animation:reveal .36s ease-out}@keyframes reveal{from{opacity:.35;transform:translateY(.7cqw)}to{opacity:1;transform:none}}.stage-foot{position:absolute;left:5%;right:5%;bottom:3%;font-size:1.1cqw;display:flex;justify-content:space-between;color:#e6edf5b8;z-index:3;pointer-events:none}
+.stage[data-mode=village]{background:radial-gradient(ellipse at 20% 40%,#3c7658,#142b31 80%);--accent:#fce5a0}.stage[data-mode=orbit]{background:radial-gradient(ellipse at 33% 50%,#26396d,#090f22 72%);--accent:#b9d8ff}.stage[data-mode=orbit] .node{background:#243657}.stage[data-mode=orbit] .node[aria-pressed=true]{background:var(--accent)}.stage[data-mode=journey]{background:linear-gradient(135deg,#1c454d,#20364c 45%,#3a343b);--accent:#f8d5a3}.stage[data-mode=journey] .node{border-radius:28%;background:#274c52}.stage[data-mode=journey] .node[aria-pressed=true]{background:var(--accent)}.stage[data-mode=bauhaus]{background:#e9dfc9;color:#19292c;--accent:#fbd55d}.stage[data-mode=bauhaus] .scene-title small,.stage[data-mode=bauhaus] .stage-foot{color:#283938}.stage[data-mode=bauhaus] .node{border-radius:5%;background:#183c43;border:0;box-shadow:none}.stage[data-mode=bauhaus] .node:nth-of-type(3n){background:#a83b32}.stage[data-mode=bauhaus] .node:nth-of-type(3n+1){background:#c08c27}.stage[data-mode=bauhaus] .node .label{color:#19292c;text-shadow:none}.stage[data-mode=bauhaus] .node[aria-pressed=true]{background:#fbd55d;outline:3px solid #253335}.stage[data-mode=bauhaus] .detail{background:#26393c;border:0;border-radius:0}
+.stage[data-mode=slides]{background:linear-gradient(130deg,#132c42,#0e182c);--accent:#bde8de}.stage[data-mode=slides] .world{display:none}.stage[data-mode=slides] .detail{inset:20% 12% 15%;width:auto;text-align:center;background:transparent;border:0;align-items:center}.stage[data-mode=slides] .detail h3{font-size:6.8cqw}.stage[data-mode=slides] .detail p{font-size:3.4cqw;max-width:85%}.stage[data-mode=slides] .detail .action{font-size:1.9cqw}
+.navigation{margin-top:12px}.navigation .step{color:var(--muted);font-size:.9rem}.chapters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 20px}.chapters button{font-size:.88rem}.notes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.panel{border:1px solid #344357;border-radius:12px;background:#111e2c;padding:16px;min-width:0}.panel h2{font-size:1rem;margin-bottom:8px}.panel p{line-height:1.65;white-space:pre-wrap}.panel .hint{font-size:.85rem}.editor{margin:18px 0}.editor textarea{width:100%;min-height:250px;resize:vertical;background:#0a1420;color:#e6edf5;border:1px solid #40516a;border-radius:8px;padding:12px;font-family:monospace;line-height:1.5}.editor summary{cursor:pointer;font-weight:700;margin-bottom:10px}.editor .tools{margin-top:10px}.status{min-height:1.5em;color:#bce8d8}.source{font-size:.88rem;line-height:1.65;color:var(--muted);padding-bottom:24px}
+@media(max-width:650px){header,main{padding:12px}.notes{grid-template-columns:1fr}.tools .spacer{display:none}.tools button{font-size:.85rem}.node .label{font-size:1.85cqw}.stage-foot{font-size:1.3cqw}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><a href="../">← ProjectionLabs</a><span>INTERACTIVE STORY WORLDS / 互動敘事研究</span></header>
+<main>
+<section class="intro"><h1>不只是投影片：讓內容成為一個世界</h1><p>同一組內容，四種可探索的視覺隱喻，以及傳統線性投影片作為對照。先從全貌選擇主題，也能依講稿順序帶領會眾。</p></section>
+<div class="tools" id="modes" aria-label="敘事模式"><button data-mode="village">像素聚落</button><button data-mode="orbit">行星系統</button><button data-mode="journey">旅程地圖</button><button data-mode="bauhaus">包浩斯構圖</button><button data-mode="slides">傳統投影片</button><span class="spacer"></span><button id="project">全螢幕投影</button><button id="remote">獨立投影視窗</button></div>
+<div class="stage-shell" id="shell"><button class="exit" id="exit">離開滿版</button><div class="stage" id="stage" data-mode="village"><div class="scene-title"><div><small id="kicker"></small><h2 id="worldTitle"></h2></div><span class="counter" id="counter"></span></div><div class="world" id="world"></div><article class="detail" id="detail" aria-live="polite"><div class="eyebrow" id="eyebrow"></div><h3 id="heading"></h3><p id="body"></p><div class="action" id="action"></div></article><div class="stage-foot"><span id="worldHint"></span><span id="visitedCount"></span></div></div></div>
+<div class="navigation"><button id="home">回到全貌</button><button id="prev">← 上一站</button><button id="next">下一站 →</button><button id="reset">清除探索紀錄</button><span class="step" id="step"></span></div>
+<div class="chapters" id="chapters" aria-label="快速跳轉"></div>
+<div class="notes"><section class="panel"><h2>講員備忘（不會出現在投影視窗）</h2><p id="notes"></p></section><section class="panel"><h2>敘事方法</h2><p id="method"></p><p class="hint">快捷鍵：← / →、PageUp / PageDown、空白鍵，Home 回全貌，1–6 跳站，F 全螢幕。獨立投影視窗與此頁同源同步，可拖曳至第二螢幕。</p></section></div>
+<details class="panel editor"><summary>編輯自己的敘事內容／JSON 匯入與離線匯出</summary><p class="hint">六個節點共用內容；每站可編輯圖示、標題、短文、行動提示與講員備忘。資料只存在瀏覽器，不會上傳。投影文字請保持簡短。</p><textarea id="editor" aria-label="敘事 JSON" spellcheck="false"></textarea><div class="tools"><button id="apply">套用內容</button><button id="sample">恢復示範</button><button id="download">下載 JSON</button><button id="upload">匯入 JSON</button><button id="export">下載獨立 HTML</button><input hidden type="file" accept=".json,application/json" id="file"></div><p id="status" class="status" role="status"></p></details>
+<p class="source">靈感來源：<a href="https://www.breakingchange.blog/p/fewer-slides-more-dragons">Fewer slides, more dragons — Michelle Bu</a>。本頁是獨立實作，不依賴外部函式庫或圖片。示範主題為原創教會聚會內容，並非正式聚會流程。</p>
+</main>
+<script type="application/json" id="story-data">{"title":"一起走向生命的豐盛","subtitle":"從相遇，到彼此成全","overview":"教會不只是一個聚會地點，而是一段彼此陪伴、共同成長的旅程。","overviewNotes":"先展示全貌，介紹六個主題的關係。可以詢問會眾想先探索哪一站，再依現場需要調整順序。","nodes":[{"icon":"✦","title":"相遇","body":"每一次相遇，都可能是一個新的開始。","action":"歡迎每一位來到這裡的人。","notes":"歡迎新朋友，簡短說明今天的聚會主題。"},{"icon":"♫","title":"敬拜","body":"將目光從自己轉向神，讓心重新得力。","action":"一起用歌聲與禱告回應。","notes":"銜接詩歌敬拜，邀請會眾安靜預備心。"},{"icon":"▤","title":"聆聽","body":"在真理中看見方向，在生活中實踐所聽見的。","action":"聽見、思想、回應。","notes":"引介信息，提出一個值得帶回生活的問題。"},{"icon":"♥","title":"同行","body":"不必獨自走過每一段路。","action":"彼此關心，互相扶持。","notes":"可邀請小組分享或介紹關懷與代禱。"},{"icon":"✧","title":"服事","body":"讓所領受的愛，成為別人的祝福。","action":"用自己的恩賜參與。","notes":"介紹本週可以參與的服事與實際行動。"},{"icon":"↗","title":"差遣","body":"帶著盼望，走進每一天的生活。","action":"把祝福帶到世界。","notes":"總結今日信息，預備祝福禱告。"}]}</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const initial=JSON.parse($('story-data').textContent);
+const configs={
+ village:{name:'像素聚落',kicker:'01 / VILLAGE',hint:'選擇聚落中的任一據點',method:'以聚落比喻群體：各據點彼此連結，但不必按照固定順序探索。適合介紹教會事工、團隊或活動。',points:[[19,25],[48,18],[79,28],[18,67],[47,72],[80,66]]},
+ orbit:{name:'行星系統',kicker:'02 / PLANETARY SYSTEM',hint:'選擇任一行星，從核心向外探索',method:'以中心與軌道呈現共同使命和不同事工。所有節點同時存在，特別適合說明多個主題如何環繞同一核心。',points:[[50,15],[82,27],[82,68],[50,82],[18,68],[18,27]]},
+ journey:{name:'旅程地圖',kicker:'03 / JOURNEY',hint:'沿路前進，也可以跳到任一站',method:'以路徑呈現有先後關係的生命歷程。保留方向感與全局位置，適合講道敘事或聚會流程。',points:[[13,68],[28,39],[44,66],[57,28],[72,59],[87,25]]},
+ bauhaus:{name:'包浩斯構圖',kicker:'04 / BAUHAUS',hint:'從幾何模組探索每一個主題',method:'用形狀、色塊與比例組織概念。視覺層次比條列更鮮明，適合主題概覽、價值觀及關係圖。',points:[[18,23],[50,23],[82,23],[18,68],[50,68],[82,68]]},
+ slides:{name:'傳統投影片',kicker:'05 / LINEAR SLIDES',hint:'依序切換單一畫面',method:'對照組：每次只顯示一項內容，其他主題不可見。比較相同內容在傳統線性簡報與空間式敘事中的理解差異。',points:[]}
+};
+let story=structuredClone(initial),mode='village',selected=-1,visited=new Set(),popup=null;
+const projection=new URLSearchParams(location.search).has('projection');
+let channel=null;try{channel=new BroadcastChannel('projectionlabs-interactive-worlds-v1')}catch{}
+function valid(raw){
+ if(!raw||typeof raw!=='object'||!Array.isArray(raw.nodes)||raw.nodes.length!==6)throw Error('必須有六個節點。');
+ const str=(v,n,max)=>{if(typeof v!=='string'||!v.trim()||v.length>max)throw Error(n+' 必須是 1–'+max+' 字的文字。');return v.trim()};
+ return {title:str(raw.title,'主題',24),subtitle:str(raw.subtitle,'副標題',30),overview:str(raw.overview,'全貌短文',120),overviewNotes:str(raw.overviewNotes,'全貌備忘',2000),nodes:raw.nodes.map((n,i)=>{if(!n||typeof n!=='object')throw Error('節點 '+(i+1)+' 格式不正確。');return {icon:str(n.icon,'圖示',8),title:str(n.title,'節點標題',10),body:str(n.body,'節點短文',100),action:str(n.action,'行動提示',60),notes:str(n.notes,'講員備忘',2000)}})};
+}
+const svgNS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){const e=document.createElementNS(svgNS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);if(parent)parent.append(e);return e}
+function drawWorld(){
+ const w=$('world');w.replaceChildren();if(mode==='slides')return;
+ const svg=el('svg',{viewBox:'0 0 1000 620',preserveAspectRatio:'none','aria-hidden':'true'},w);
+ const line=(x1,y1,x2,y2,stroke,width=3,dash='')=>el('line',{x1,y1,x2,y2,stroke,'stroke-width':width,'stroke-dasharray':dash},svg);
+ const pts=configs[mode].points.map(([x,y])=>[x*10,y*6.2]);
+ if(mode==='village'){
+  el('path',{d:'M0 490 Q260 320 480 410 T1000 220 L1000 320 Q740 540 460 505 T0 590Z',fill:'#6cb0b0',opacity:'.32'},svg);
+  for(let i=0;i<42;i++){const x=(i*137+35)%1000,y=(i*79+40)%620;el('rect',{x,y,width:12+(i%3)*5,height:13+(i%3)*6,fill:i%2?'#94ba70':'#275443',opacity:'.65'},svg)}
+  [[0,1],[1,2],[0,3],[1,4],[2,5],[3,4],[4,5]].forEach(([a,b])=>line(...pts[a],...pts[b],'#e4c48c',15,'14 9'));
+  for(const [x,y] of pts){el('rect',{x:x-78,y:y-48,width:156,height:96,rx:5,fill:'#9aa96d',opacity:'.35'},svg);el('path',{d:'M'+(x-74)+' '+(y-31)+' L'+x+' '+(y-85)+' L'+(x+74)+' '+(y-31)+'Z',fill:'#d2a571',opacity:'.85'},svg)}
+ } else if(mode==='orbit'){
+  for(let i=0;i<65;i++)el('circle',{cx:(i*137+21)%1000,cy:(i*83+17)%620,r:i%5===0?2:1,fill:'#dceaff',opacity:'.5'},svg);
+  for(const [rx,ry] of [[145,90],[240,150],[365,230]])el('ellipse',{cx:500,cy:310,rx,ry,fill:'none',stroke:'#94b9f3','stroke-width':2,opacity:'.38'},svg);
+  for(const [x,y] of pts)line(500,310,x,y,'#7597ca',2,'7 10');
+  el('circle',{cx:500,cy:310,r:49,fill:'#ffe2a0',opacity:'.2'},svg);el('circle',{cx:500,cy:310,r:31,fill:'#ffe2a0'},svg);
+ } else if(mode==='journey'){
+  for(let i=0;i<6;i++)el('path',{d:'M0 '+(120+i*85)+' Q220 '+(20+i*85)+' 500 '+(130+i*85)+' T1000 '+(60+i*85),stroke:'#b5d1c6','stroke-width':2,fill:'none',opacity:'.18'},svg);
+  const path=pts.map(([x,y],i)=>(i?'L':'M')+x+' '+y).join(' ');
+  el('path',{d:path,stroke:'#0d2431','stroke-width':21,fill:'none','stroke-linejoin':'round'},svg);
+  el('path',{d:path,stroke:'#f2d1a0','stroke-width':5,fill:'none','stroke-linejoin':'round','stroke-dasharray':'10 9'},svg);
+ } else {
+  el('rect',{x:30,y:14,width:940,height:590,fill:'#d4c8ae'},svg);
+  el('circle',{cx:172,cy:150,r:145,fill:'#c44d3f',opacity:'.8'},svg);
+  el('rect',{x:385,y:0,width:230,height:620,fill:'#e9ba46'},svg);
+  el('path',{d:'M655 20H970V600H655L820 310Z',fill:'#31646c'},svg);
+  line(0,306,1000,306,'#24373a',8);line(330,0,330,620,'#24373a',8);line(650,0,650,620,'#24373a',8);
+ }
+ configs[mode].points.forEach(([x,y],i)=>{const b=document.createElement('button');b.className='node';b.style.left=x+'%';b.style.top=y+'%';b.type='button';b.dataset.index=i;const symbol=document.createElement('span');symbol.className='symbol';symbol.textContent=story.nodes[i].icon;const label=document.createElement('span');label.className='label';label.textContent=story.nodes[i].title;b.append(symbol,label);b.addEventListener('click',()=>choose(i));w.append(b)});
+}
+function render(rebuild=false){
+ const c=configs[mode],n=story.nodes[selected];$('stage').dataset.mode=mode;
+ $('kicker').textContent=c.kicker;$('worldTitle').textContent=story.title;$('counter').textContent=selected<0?'全貌 / 06':String(selected+1).padStart(2,'0')+' / 06';
+ $('eyebrow').textContent=n?'主題 '+String(selected+1).padStart(2,'0'):'從這裡開始';
+ $('heading').textContent=n?n.title:story.subtitle;$('body').textContent=n?n.body:story.overview;$('action').textContent=n?n.action:'探索六個主題，找到彼此的連結。';
+ $('worldHint').textContent=c.hint;$('visitedCount').textContent='已探索 '+visited.size+' / 6';$('notes').textContent=n?n.notes:story.overviewNotes;$('method').textContent=c.method;$('step').textContent=selected<0?'目前：全貌':'目前：'+n.title;
+ $('prev').disabled=selected<0;$('next').disabled=selected===5;$('home').disabled=selected<0;
+ document.querySelectorAll('[data-mode]').forEach(b=>{if(b.tagName==='BUTTON')b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});
+ if(rebuild){drawWorld();const nav=$('chapters');nav.replaceChildren();story.nodes.forEach((n,i)=>{const b=document.createElement('button');b.textContent=(i+1)+' '+n.title;b.dataset.index=i;b.addEventListener('click',()=>choose(i));nav.append(b)})}
+ document.querySelectorAll('[data-index]').forEach(b=>{const i=Number(b.dataset.index);b.setAttribute('aria-pressed',String(i===selected));b.classList.toggle('visited',visited.has(i))});
+ const d=$('detail');d.classList.remove('animate');if(!matchMedia('(prefers-reduced-motion: reduce)').matches){void d.offsetWidth;d.classList.add('animate')}
+}
+function sync(){channel?.postMessage({type:'state',story,mode,selected,visited:[...visited]})}
+function choose(i,send=true){selected=Math.max(-1,Math.min(5,i));if(selected>=0)visited.add(selected);render();if(send)sync()}
+function setMode(m){if(!configs[m])return;mode=m;render(true);sync()}
+channel?.addEventListener('message',e=>{const d=e.data;if(d?.type==='request'&&!projection)sync();if(d?.type==='state'&&projection){try{story=valid(d.story);if(!configs[d.mode])return;const rebuild=mode!==d.mode||JSON.stringify(story)!==$('story-data').dataset.last;mode=d.mode;selected=Number.isInteger(d.selected)?Math.max(-1,Math.min(5,d.selected)):-1;visited=new Set((Array.isArray(d.visited)?d.visited:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<6));$('story-data').dataset.last=JSON.stringify(story);render(rebuild)}catch{}}});
+function toggleFull(){const s=$('shell');if(document.fullscreenElement){document.exitFullscreen();return}if(s.classList.contains('theater')){s.classList.remove('theater');return}if(s.requestFullscreen){s.requestFullscreen().catch(()=>s.classList.add('theater'))}else s.classList.add('theater')}
+$('project').onclick=toggleFull;$('exit').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else if(!projection)$('shell').classList.remove('theater');else window.close()};
+$('remote').onclick=()=>{if(!channel){$('status').textContent='此瀏覽器不支援跨視窗同步。';alert('此瀏覽器不支援 BroadcastChannel。');return}const url=new URL(location.href);url.searchParams.set('projection','1');popup=window.open(url,'projectionStoryWorld','popup,width=1280,height=720');if(!popup){alert('請允許開啟投影視窗。');return}sync()};
+$('modes').onclick=e=>{const b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode)};
+$('home').onclick=()=>choose(-1);$('prev').onclick=()=>choose(selected-1);$('next').onclick=()=>choose(selected+1);$('reset').onclick=()=>{visited.clear();choose(-1)};
+document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||e.target.closest('textarea,input,select,button,[contenteditable]'))return;let handled=true;if(e.key==='Escape'){if(!projection)$('shell').classList.remove('theater');return}if(e.key.toLowerCase()==='f')toggleFull();else if(projection)return;else if(['ArrowRight','PageDown',' '].includes(e.key))choose(selected+1);else if(['ArrowLeft','PageUp'].includes(e.key))choose(selected-1);else if(e.key==='Home')choose(-1);else if(/^[1-6]$/.test(e.key))choose(Number(e.key)-1);else handled=false;if(handled)e.preventDefault()});
+function updateEditor(){ $('editor').value=JSON.stringify(story,null,2) }
+function apply(raw){story=valid(raw);selected=-1;visited.clear();updateEditor();render(true);sync();$('status').textContent='已套用內容。'}
+$('apply').onclick=()=>{try{apply(JSON.parse($('editor').value))}catch(e){$('status').textContent=e.message}};
+$('sample').onclick=()=>apply(initial);
+function save(content,name,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$('download').onclick=()=>save(JSON.stringify(story,null,2),'story-world.json','application/json');
+$('upload').onclick=()=>$('file').click();$('file').onchange=async()=>{const f=$('file').files[0];if(!f)return;try{apply(JSON.parse(await f.text()))}catch(e){$('status').textContent=e.message}finally{$('file').value=''}};
+$('export').onclick=()=>{const clone=document.documentElement.cloneNode(true);const q=id=>clone.querySelector('#'+id);q('story-data').textContent=JSON.stringify(story).replace(/</g,'\\u003c');q('story-data').removeAttribute('data-last');q('shell').classList.remove('theater');q('world').replaceChildren();q('chapters').replaceChildren();q('editor').textContent='';q('status').textContent='';save('<!doctype html>\n'+clone.outerHTML,'interactive-story-world.html','text/html;charset=utf-8');$('status').textContent='已匯出單檔 HTML（含目前已套用內容）。'};
+updateEditor();render(true);
+if(projection){document.body.classList.add('projection');$('shell').classList.add('theater');$('world').style.pointerEvents='none';channel?.postMessage({type:'request'});}
+</script>
+</body></html>
